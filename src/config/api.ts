@@ -12,9 +12,14 @@ export const getApiUrl = (endpoint: string) => {
   return `${baseUrl}/${cleanEndpoint}`;
 };
 
+// Helper function to get token from both storage locations
+export const getAuthToken = () => {
+  return localStorage.getItem('skillx-token') || sessionStorage.getItem('skillx-token');
+};
+
 // Helper function for authenticated requests
 export const authenticatedFetch = async (endpoint: string, options: RequestInit = {}) => {
-  const token = localStorage.getItem('skillx-token');
+  const token = getAuthToken();
   const url = getApiUrl(endpoint);
   
   const config: RequestInit = {

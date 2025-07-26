@@ -28,7 +28,7 @@ import {
   Users
 } from 'lucide-react';
 import { recommendationsApi } from '@/services/recommendationsApi';
-import { getApiUrl } from '@/config/api';
+import { getApiUrl, getAuthToken } from '@/config/api';
 
 interface Course {
   id: string;
@@ -81,7 +81,7 @@ const Dashboard = () => {
 
   // Move fetchRoadmapAndProgress out of useEffect
   const fetchRoadmapAndProgress = async () => {
-    const token = localStorage.getItem('skillx-token');
+    const token = getAuthToken();
     if (!token || !currentCareer) return;
     try {
       // Fetch all recommendations and find the current career
@@ -156,7 +156,7 @@ const Dashboard = () => {
 
     // Fetch user profile for XP/level
     const fetchUserProfile = async () => {
-      const token = localStorage.getItem('skillx-token');
+      const token = getAuthToken();
       if (!token) return;
       try {
         const response = await fetch(getApiUrl('/api/users/profile'), {
@@ -278,7 +278,7 @@ const Dashboard = () => {
 
   // Add function to update step progress in backend
   const updateStepProgress = async (stepIndex: number, completed: boolean) => {
-    const token = localStorage.getItem('skillx-token');
+    const token = getAuthToken();
     if (!token || !currentCareer) return;
     try {
       await fetch(getApiUrl(`/api/progress/${currentCareer}/step/${stepIndex}`), {
@@ -298,7 +298,7 @@ const Dashboard = () => {
   };
 
   const markResourceComplete = async (stepIndex: number, resourceUrl: string) => {
-    const token = localStorage.getItem('skillx-token');
+    const token = getAuthToken();
     if (!token || !currentCareer) return;
     await fetch(getApiUrl(`/api/progress/${currentCareer}/step/${stepIndex}/resource/complete`), {
       method: 'POST',
@@ -311,7 +311,7 @@ const Dashboard = () => {
     setCompletedResources(prev => ({ ...prev, [`${stepIndex}|${resourceUrl}`]: true }));
   };
   const markResourceIncomplete = async (stepIndex: number, resourceUrl: string) => {
-    const token = localStorage.getItem('skillx-token');
+    const token = getAuthToken();
     if (!token || !currentCareer) return;
     await fetch(getApiUrl(`/api/progress/${currentCareer}/step/${stepIndex}/resource/incomplete`), {
       method: 'POST',

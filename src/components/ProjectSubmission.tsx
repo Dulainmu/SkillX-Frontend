@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Upload, FileText, Send, X } from 'lucide-react';
-import { getApiUrl } from '@/config/api';
+import { getApiUrl, getAuthToken } from '@/config/api';
 
 interface Project {
   id: string;
@@ -65,7 +65,7 @@ const ProjectSubmission = ({ project, careerRoleId, stepIndex, onSubmit }: Proje
     }
 
     try {
-      const token = localStorage.getItem('skillx-token');
+      const token = getAuthToken();
       if (!token) throw new Error('Not authenticated');
       const formData = new FormData();
       formData.append('careerRoleId', careerRoleId);

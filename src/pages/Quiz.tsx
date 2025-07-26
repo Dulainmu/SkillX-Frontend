@@ -9,7 +9,7 @@ import { LoadingSpinner } from '@/components/quiz/LoadingSpinner';
 import { useQuiz } from '@/contexts/QuizContext';
 import { quizQuestions } from '@/data/quizQuestions';
 import { useToast } from '@/hooks/use-toast';
-import { getApiUrl } from '@/config/api';
+import { getApiUrl, getAuthToken } from '@/config/api';
 
 const Quiz = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -57,7 +57,7 @@ const Quiz = () => {
     setError('');
 
     try {
-      const token = localStorage.getItem('skillx-token');
+      const token = getAuthToken();
       if (!token) throw new Error('Not authenticated');
       const response = await fetch(getApiUrl('/api/quiz/submit'), {
         method: 'POST',
