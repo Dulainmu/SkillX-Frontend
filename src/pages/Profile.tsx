@@ -10,7 +10,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useCareer } from '@/contexts/CareerContext';
-import { getApiUrl, authenticatedFetch } from '@/config/api';
+import { getApiUrl, getAuthToken } from '@/config/api';
 import { 
   User, 
   Mail, 
@@ -77,7 +77,7 @@ const Profile = () => {
   ];
 
   const fetchUserStats = async () => {
-    const token = localStorage.getItem('skillx-token');
+    const token = getAuthToken();
     if (!token) return;
     try {
       // Fetch projects count
@@ -125,7 +125,7 @@ const Profile = () => {
   };
 
   const fetchProfile = async () => {
-    const token = localStorage.getItem('skillx-token');
+    const token = getAuthToken();
     if (!token) return;
     try {
       const response = await fetch(getApiUrl('/api/users/profile'), {
@@ -149,15 +149,26 @@ const Profile = () => {
             achievement: data.notificationSettings.achievement ?? true
           });
         }
+      } else {
+        console.error('Profile fetch failed:', response.status, response.statusText);
+        // Set default values if profile fetch fails
+        setUserInfo(prev => ({
+          ...prev,
+          name: 'User',
+          email: 'user@example.com',
+          totalXp: 0,
+          level: 1
+        }));
       }
     } catch (error) {
+      console.error('Profile fetch error:', error);
       toast({ title: 'Error', description: 'Failed to load profile', variant: 'destructive' });
     }
   };
 
   // Update notification settings
   const updateNotificationSettings = async (newSettings) => {
-    const token = localStorage.getItem('skillx-token');
+    const token = getAuthToken();
     if (!token) return;
     setNotificationLoading(true);
     try {
@@ -187,7 +198,7 @@ const Profile = () => {
   const fetchCareerProgress = async () => {
     setCareerProgressLoading(true);
     setCareerProgressError('');
-    const token = localStorage.getItem('skillx-token');
+    const token = getAuthToken();
     if (!token) {
       setCareerProgressError('No authentication token found');
       setCareerProgressLoading(false);
@@ -204,9 +215,8 @@ const Profile = () => {
         console.log('Progress data:', progressData);
       } else {
         console.error('Failed to fetch progress:', progressRes.status);
-        setCareerProgressError('Failed to load career progress');
-        setCareerProgressLoading(false);
-        return;
+        // Continue with empty progress data instead of failing completely
+        progressData = [];
       }
       
       // Fetch all careers
@@ -218,9 +228,8 @@ const Profile = () => {
         console.log('Careers data:', careersData);
       } else {
         console.error('Failed to fetch careers:', careersRes.status);
-        setCareerProgressError('Failed to load career data');
-        setCareerProgressLoading(false);
-        return;
+        // Continue with empty careers data instead of failing completely
+        careersData = [];
       }
       
       // Map progress to career details
@@ -260,7 +269,7 @@ const Profile = () => {
     const fetchAchievements = async () => {
       setAchievementsLoading(true);
       setAchievementsError('');
-      const token = localStorage.getItem('skillx-token');
+      const token = getAuthToken();
       if (!token) return;
       try {
         const response = await fetch(getApiUrl('/api/users/my-achievements'), {
@@ -292,7 +301,7 @@ const Profile = () => {
       return;
     }
     setProfileErrors({ name: '' });
-    const token = localStorage.getItem('skillx-token');
+    const token = getAuthToken();
     if (!token) return;
     try {
       const response = await fetch(getApiUrl('/api/users/profile'), {
@@ -326,7 +335,7 @@ const Profile = () => {
     if (!window.confirm('Are you sure you want to reset your account? This will delete all your progress, submissions, and quiz results. This action cannot be undone.')) {
       return;
     }
-    const token = localStorage.getItem('skillx-token');
+    const token = getAuthToken();
     if (!token) return;
     try {
       const response = await fetch(getApiUrl('/api/users/reset-account'), {
@@ -348,7 +357,7 @@ const Profile = () => {
   const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const token = localStorage.getItem('skillx-token');
+    const token = getAuthToken();
     const formData = new FormData();
     formData.append('avatar', file);
     try {
@@ -378,7 +387,7 @@ const Profile = () => {
       setIsChangingPassword(false);
       return;
     }
-    const token = localStorage.getItem('skillx-token');
+    const token = getAuthToken();
     try {
       const response = await fetch(getApiUrl('/api/users/change-password'), {
         method: 'POST',
@@ -406,7 +415,7 @@ const Profile = () => {
 
   const handleDeleteAccount = async () => {
     if (!window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) return;
-    const token = localStorage.getItem('skillx-token');
+    const token = getAuthToken();
     try {
       const response = await fetch(getApiUrl('/api/users/delete-account'), {
         method: 'DELETE',

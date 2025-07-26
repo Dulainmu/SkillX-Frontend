@@ -69,6 +69,19 @@ Your Railway backend should have these endpoints:
    - `GET /api/submissions`
    - `GET /api/submissions/all/mentor`
 
+6. **User Profile & Settings:**
+   - `GET /api/users/profile`
+   - `PUT /api/users/profile`
+   - `POST /api/users/avatar`
+   - `POST /api/users/change-password`
+   - `GET /api/users/my-achievements`
+   - `PUT /api/users/notification-settings`
+   - `POST /api/users/reset-account`
+   - `DELETE /api/users/delete-account`
+
+7. **Progress Tracking:**
+   - `GET /api/progress/all` (for profile stats)
+
 ## Testing the Connection
 
 After deployment, test that your frontend can communicate with your Railway backend by:
