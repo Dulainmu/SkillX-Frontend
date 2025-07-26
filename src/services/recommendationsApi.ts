@@ -42,5 +42,37 @@ export const recommendationsApi = {
       console.error('Error fetching recommendations:', error);
       throw error;
     }
+  },
+
+  async getCareerById(careerId: string): Promise<CareerRecommendation | null> {
+    try {
+      const token = getAuthToken();
+      
+      // Try to fetch specific career details
+      if (token) {
+        try {
+          const response = await fetch(getApiUrl(`/api/careers/${careerId}`), {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            return data;
+          }
+        } catch (error) {
+          console.log('Specific career endpoint not available, falling back to general recommendations');
+        }
+      }
+      
+      // Fallback to general recommendations
+      const recommendations = await this.getRecommendations();
+      return recommendations.find(career => career.id === careerId) || null;
+    } catch (error) {
+      console.error('Error fetching career by ID:', error);
+      throw error;
+    }
   }
 };

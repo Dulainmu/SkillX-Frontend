@@ -58,6 +58,8 @@ Your Railway backend should have these endpoints:
 3. **Recommendations:**
    - `GET /api/recommendations/personalized` (for personalized match scores)
    - `GET /api/recommendations/careers` (fallback for general recommendations)
+   - `GET /api/careers/:id` (for specific career details)
+   - `GET /api/careers/:id/roadmap` (for detailed career roadmap)
 
 4. **Progress Tracking:**
    - `GET /api/progress/:careerId`
@@ -113,4 +115,7 @@ app.use(cors({
 ```
 
 ### Double Slash Issues
-If you see URLs with double slashes like `https://skillx-backend-production.up.railway.app//api/users/login`, the frontend URL generation has been fixed to handle this automatically. 
+If you see URLs with double slashes like `https://skillx-backend-production.up.railway.app//api/users/login`, the frontend URL generation has been fixed to handle this automatically.
+
+### Mentor Dashboard
+The mentor dashboard now uses a simplified header without user navigation elements, providing a cleaner interface focused on project review functionality. 

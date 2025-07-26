@@ -10,7 +10,7 @@ import { LoadingSpinner } from '@/components/quiz/LoadingSpinner';
 import { CareerRecommendation, RoadmapStep, Project } from '@/types/recommendations';
 import { recommendationsApi } from '@/services/recommendationsApi';
 import { useToast } from '@/hooks/use-toast';
-import { getApiUrl } from '@/config/api';
+import { getApiUrl, getAuthToken } from '@/config/api';
 import { 
   ArrowLeft, 
   Trophy, 
@@ -38,7 +38,7 @@ const CareerRoadmap = () => {
 
   // Fetch user progress from backend
   const fetchUserProgress = useCallback(async (careerRoleId: string) => {
-    const token = localStorage.getItem('skillx-token');
+    const token = getAuthToken();
     if (!token) return;
     try {
           const response = await fetch(getApiUrl(`/api/progress/${careerRoleId}`), {
@@ -68,7 +68,7 @@ const CareerRoadmap = () => {
 
   // Start progress for a career
   const startCareerProgress = async (careerRoleId: string) => {
-    const token = localStorage.getItem('skillx-token');
+    const token = getAuthToken();
     if (!token) return;
     try {
       const response = await fetch(getApiUrl('/api/progress/start'), {
@@ -89,7 +89,7 @@ const CareerRoadmap = () => {
 
   // Update a step's completion status
   const updateStepProgress = async (careerRoleId: string, stepIndex: number, completed: boolean) => {
-    const token = localStorage.getItem('skillx-token');
+    const token = getAuthToken();
     if (!token) return;
     try {
       await fetch(getApiUrl(`/api/progress/${careerRoleId}/step/${stepIndex}`), {
@@ -112,28 +112,42 @@ const CareerRoadmap = () => {
         setIsLoading(true);
         console.log('Looking for career with ID:', careerId);
         
-        // In a real app, this would fetch specific career details
-        const recommendations = await recommendationsApi.getRecommendations();
-        console.log('Available careers:', recommendations.map(c => ({ id: c.id, name: c.name })));
+        // Fetch specific career details from the server
+        const token = getAuthToken();
+        if (!token) {
+          toast({
+            title: "Authentication Error",
+            description: "Please log in to view career details.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Try to fetch detailed career roadmap from server
+        const careerData = await recommendationsApi.getCareerById(careerId!);
         
-        const foundCareer = recommendations.find(c => c.id === careerId);
-        console.log('Found career:', foundCareer);
-        
-        if (foundCareer) {
-          // Add detailed roadmap data (in real app, this would come from API)
-          const detailedCareer: CareerRecommendation = {
-            ...foundCareer,
-            detailedRoadmap: generateDetailedRoadmap(foundCareer.name)
-          };
-          setCareer(detailedCareer);
+        if (careerData) {
+          console.log('Career data from server:', careerData);
+          
+          // If the career doesn't have detailed roadmap, generate mock data
+          if (!careerData.detailedRoadmap) {
+            careerData.detailedRoadmap = generateDetailedRoadmap(careerData.name);
+          }
+          
+          setCareer(careerData);
         } else {
           console.error('Career not found for ID:', careerId);
+          toast({
+            title: "Career Not Found",
+            description: "The requested career path could not be found.",
+            variant: "destructive",
+          });
         }
       } catch (error) {
         console.error('Failed to load career details:', error);
         toast({
           title: "Error",
-          description: "Failed to load career details.",
+          description: "Failed to load career details. Please try again.",
           variant: "destructive",
         });
       } finally {

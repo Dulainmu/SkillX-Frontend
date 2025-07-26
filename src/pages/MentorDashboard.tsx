@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { getApiUrl } from '@/config/api';
+import { getApiUrl, getAuthToken } from '@/config/api';
 import { 
   Users, 
   FileText, 
@@ -18,8 +17,11 @@ import {
   CheckCircle2,
   MessageSquare,
   Download,
-  Award
+  Award,
+  BrainCircuit,
+  LogOut
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface ProjectSubmission {
   id: string;
@@ -45,7 +47,7 @@ const MentorDashboard = () => {
 
   useEffect(() => {
     const fetchSubmissions = async () => {
-      const token = localStorage.getItem('skillx-token');
+      const token = getAuthToken();
       if (!token) return;
       try {
         const response = await fetch(getApiUrl('/api/submissions/all/mentor'), {
@@ -69,7 +71,7 @@ const MentorDashboard = () => {
   }, [toast]);
 
   const handleReviewSubmission = async (submissionId: string, newFeedback: string, newScore: number) => {
-    const token = localStorage.getItem('skillx-token');
+    const token = getAuthToken();
     if (!token) return;
     try {
       const response = await fetch(getApiUrl(`/api/submissions/${submissionId}/review`), {
@@ -95,7 +97,7 @@ const MentorDashboard = () => {
   };
 
   const handleApproveSubmission = async (submissionId: string) => {
-    const token = localStorage.getItem('skillx-token');
+    const token = getAuthToken();
     if (!token) return;
     try {
       const response = await fetch(getApiUrl(`/api/submissions/${submissionId}/review`), {
@@ -139,9 +141,42 @@ const MentorDashboard = () => {
   const reviewedCount = submissions.filter(s => s.status === 'reviewed').length;
   const approvedCount = submissions.filter(s => s.status === 'approved').length;
 
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('skillx-token');
+    sessionStorage.removeItem('skillx-token');
+    navigate('/login');
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-background via-background to-muted/10">
-      <Header />
+      {/* Custom Mentor Header */}
+      <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between">
+            {/* Logo */}
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
+                <BrainCircuit className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                SkillX Mentor
+              </span>
+            </div>
+
+            {/* Logout Button */}
+            <Button
+              variant="ghost"
+              onClick={handleLogout}
+              className="flex items-center space-x-2 text-muted-foreground hover:text-foreground"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Logout</span>
+            </Button>
+          </div>
+        </div>
+      </header>
       
       <main className="flex-1 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
