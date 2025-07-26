@@ -43,6 +43,32 @@ VITE_API_URL=https://skillx-backend-production.up.railway.app
 Make sure your Railway backend is running and accessible at:
 `https://skillx-backend-production.up.railway.app`
 
+### Required Backend Endpoints
+
+Your Railway backend should have these endpoints:
+
+1. **Authentication:**
+   - `POST /api/users/login`
+   - `POST /api/users/register`
+   - `GET /api/users/profile`
+
+2. **Quiz:**
+   - `POST /api/quiz/submit`
+
+3. **Recommendations:**
+   - `GET /api/recommendations/personalized` (for personalized match scores)
+   - `GET /api/recommendations/careers` (fallback for general recommendations)
+
+4. **Progress Tracking:**
+   - `GET /api/progress/:careerId`
+   - `POST /api/progress/start`
+   - `PUT /api/progress/:careerId/step/:stepIndex`
+
+5. **Project Submissions:**
+   - `POST /api/submissions`
+   - `GET /api/submissions`
+   - `GET /api/submissions/all/mentor`
+
 ## Testing the Connection
 
 After deployment, test that your frontend can communicate with your Railway backend by:
