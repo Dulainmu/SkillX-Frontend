@@ -48,4 +48,30 @@ Make sure your Railway backend is running and accessible at:
 After deployment, test that your frontend can communicate with your Railway backend by:
 1. Opening your Vercel app URL
 2. Trying to log in or use any feature that makes API calls
-3. Checking the browser's Network tab to ensure requests are going to your Railway URL 
+3. Checking the browser's Network tab to ensure requests are going to your Railway URL
+
+## Troubleshooting
+
+### CORS Errors
+If you see CORS errors like "Access to fetch has been blocked by CORS policy", this means your Railway backend needs to be configured to allow requests from your Vercel domain.
+
+**Backend Fix Required:**
+Your Railway backend needs to add CORS configuration to allow requests from:
+- `https://skill-x-frontend.vercel.app`
+- `https://your-app-name.vercel.app` (replace with your actual Vercel domain)
+
+**Common CORS Configuration:**
+```javascript
+// In your backend server.js
+app.use(cors({
+  origin: [
+    'https://skill-x-frontend.vercel.app',
+    'https://your-app-name.vercel.app',
+    'http://localhost:3000' // for local development
+  ],
+  credentials: true
+}));
+```
+
+### Double Slash Issues
+If you see URLs with double slashes like `https://skillx-backend-production.up.railway.app//api/users/login`, the frontend URL generation has been fixed to handle this automatically. 

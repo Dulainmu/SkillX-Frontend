@@ -5,7 +5,11 @@ export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:40
 export const getApiUrl = (endpoint: string) => {
   // Remove leading slash from endpoint if it exists
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
-  return `${API_BASE_URL}/${cleanEndpoint}`;
+  
+  // Ensure API_BASE_URL doesn't end with a slash
+  const baseUrl = API_BASE_URL.endsWith('/') ? API_BASE_URL.slice(0, -1) : API_BASE_URL;
+  
+  return `${baseUrl}/${cleanEndpoint}`;
 };
 
 // Helper function for authenticated requests
