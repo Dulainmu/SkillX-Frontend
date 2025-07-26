@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Eye, EyeOff, Lock, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { getApiUrl } from '@/config/api';
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
@@ -46,7 +47,7 @@ const ResetPassword = () => {
 
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:4000/api/users/reset-password', {
+      const response = await fetch(getApiUrl('/api/users/reset-password'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

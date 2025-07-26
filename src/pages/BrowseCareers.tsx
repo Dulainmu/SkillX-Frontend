@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Search, Filter, Briefcase, TrendingUp, DollarSign, Clock, ArrowRight, Rocket } from 'lucide-react';
 import { CareerRecommendation } from '@/types/recommendations';
+import { getApiUrl } from '@/config/api';
 
 const BrowseCareers = () => {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const BrowseCareers = () => {
       setLoading(true);
       setError('');
       try {
-        const response = await fetch('http://localhost:4000/api/recommendations/careers');
+        const response = await fetch(getApiUrl('/api/recommendations/careers'));
         if (!response.ok) throw new Error('Failed to fetch careers');
         const data = await response.json();
         // Map backend fields to frontend expectations

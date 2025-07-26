@@ -28,6 +28,7 @@ import {
   Users
 } from 'lucide-react';
 import { recommendationsApi } from '@/services/recommendationsApi';
+import { getApiUrl } from '@/config/api';
 
 interface Course {
   id: string;
@@ -88,7 +89,7 @@ const Dashboard = () => {
       const foundCareer = recommendations.find(c => c.id === currentCareer);
       if (!foundCareer || !foundCareer.detailedRoadmap) return;
       // Fetch user progress for this career
-      const progressRes = await fetch(`http://localhost:4000/api/progress/${currentCareer}`, {
+      const progressRes = await fetch(getApiUrl(`/api/progress/${currentCareer}`), {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       let progressData = null;
@@ -96,7 +97,7 @@ const Dashboard = () => {
         progressData = await progressRes.json();
       }
       // Fetch user submissions
-      const submissionsRes = await fetch('http://localhost:4000/api/submissions', {
+      const submissionsRes = await fetch(getApiUrl('/api/submissions'), {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       let submissions = [];
@@ -158,7 +159,7 @@ const Dashboard = () => {
       const token = localStorage.getItem('skillx-token');
       if (!token) return;
       try {
-        const response = await fetch('http://localhost:4000/api/users/profile', {
+        const response = await fetch(getApiUrl('/api/users/profile'), {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (response.ok) {
@@ -280,7 +281,7 @@ const Dashboard = () => {
     const token = localStorage.getItem('skillx-token');
     if (!token || !currentCareer) return;
     try {
-      await fetch(`http://localhost:4000/api/progress/${currentCareer}/step/${stepIndex}`, {
+      await fetch(getApiUrl(`/api/progress/${currentCareer}/step/${stepIndex}`), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -299,7 +300,7 @@ const Dashboard = () => {
   const markResourceComplete = async (stepIndex: number, resourceUrl: string) => {
     const token = localStorage.getItem('skillx-token');
     if (!token || !currentCareer) return;
-    await fetch(`http://localhost:4000/api/progress/${currentCareer}/step/${stepIndex}/resource/complete`, {
+    await fetch(getApiUrl(`/api/progress/${currentCareer}/step/${stepIndex}/resource/complete`), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -312,7 +313,7 @@ const Dashboard = () => {
   const markResourceIncomplete = async (stepIndex: number, resourceUrl: string) => {
     const token = localStorage.getItem('skillx-token');
     if (!token || !currentCareer) return;
-    await fetch(`http://localhost:4000/api/progress/${currentCareer}/step/${stepIndex}/resource/incomplete`, {
+    await fetch(getApiUrl(`/api/progress/${currentCareer}/step/${stepIndex}/resource/incomplete`), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

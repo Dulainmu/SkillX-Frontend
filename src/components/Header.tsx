@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useCareer } from '@/contexts/CareerContext';
 import { Home, BrainCircuit, Target, Search, User, LogOut, Menu, X, BarChart3 } from 'lucide-react';
+import { getApiUrl } from '@/config/api';
 
 export const Header = () => {
   const location = useLocation();
@@ -24,7 +25,7 @@ export const Header = () => {
       const token = localStorage.getItem('skillx-token');
       if (!token) return;
       try {
-        const response = await fetch('http://localhost:4000/api/users/profile', {
+        const response = await fetch(getApiUrl('/api/users/profile'), {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (response.ok) {

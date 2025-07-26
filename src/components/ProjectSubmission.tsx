@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Upload, FileText, Send, X } from 'lucide-react';
+import { getApiUrl } from '@/config/api';
 
 interface Project {
   id: string;
@@ -77,7 +78,7 @@ const ProjectSubmission = ({ project, careerRoleId, stepIndex, onSubmit }: Proje
       if (files && files.length > 0) {
         formData.append('file', files[0]);
       }
-      const response = await fetch('http://localhost:4000/api/submissions', {
+      const response = await fetch(getApiUrl('/api/submissions'), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`

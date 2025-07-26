@@ -10,6 +10,7 @@ import { LoadingSpinner } from '@/components/quiz/LoadingSpinner';
 import { CareerRecommendation, RoadmapStep, Project } from '@/types/recommendations';
 import { recommendationsApi } from '@/services/recommendationsApi';
 import { useToast } from '@/hooks/use-toast';
+import { getApiUrl } from '@/config/api';
 import { 
   ArrowLeft, 
   Trophy, 
@@ -40,9 +41,9 @@ const CareerRoadmap = () => {
     const token = localStorage.getItem('skillx-token');
     if (!token) return;
     try {
-      const response = await fetch(`http://localhost:4000/api/progress/${careerRoleId}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+          const response = await fetch(getApiUrl(`/api/progress/${careerRoleId}`), {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
       if (response.ok) {
         const data = await response.json();
         setProgressId(data._id);
@@ -70,7 +71,7 @@ const CareerRoadmap = () => {
     const token = localStorage.getItem('skillx-token');
     if (!token) return;
     try {
-      const response = await fetch('http://localhost:4000/api/progress/start', {
+      const response = await fetch(getApiUrl('/api/progress/start'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -91,7 +92,7 @@ const CareerRoadmap = () => {
     const token = localStorage.getItem('skillx-token');
     if (!token) return;
     try {
-      await fetch(`http://localhost:4000/api/progress/${careerRoleId}/step/${stepIndex}`, {
+      await fetch(getApiUrl(`/api/progress/${careerRoleId}/step/${stepIndex}`), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

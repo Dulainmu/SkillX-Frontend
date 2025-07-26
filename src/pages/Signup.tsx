@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Eye, EyeOff, UserPlus, Lock, Mail, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { getApiUrl } from '@/config/api';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -55,7 +56,7 @@ const Signup = () => {
     setErrors(newErrors);
     if (!valid) return;
     try {
-      const response = await fetch('http://localhost:4000/api/users/register', {
+      const response = await fetch(getApiUrl('/api/users/register'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { getApiUrl } from '@/config/api';
 import { 
   Users, 
   FileText, 
@@ -47,7 +48,7 @@ const MentorDashboard = () => {
       const token = localStorage.getItem('skillx-token');
       if (!token) return;
       try {
-        const response = await fetch('http://localhost:4000/api/submissions/all/mentor', {
+        const response = await fetch(getApiUrl('/api/submissions/all/mentor'), {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (response.ok) {
@@ -71,7 +72,7 @@ const MentorDashboard = () => {
     const token = localStorage.getItem('skillx-token');
     if (!token) return;
     try {
-      const response = await fetch(`http://localhost:4000/api/submissions/${submissionId}/review`, {
+      const response = await fetch(getApiUrl(`/api/submissions/${submissionId}/review`), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -97,7 +98,7 @@ const MentorDashboard = () => {
     const token = localStorage.getItem('skillx-token');
     if (!token) return;
     try {
-      const response = await fetch(`http://localhost:4000/api/submissions/${submissionId}/review`, {
+      const response = await fetch(getApiUrl(`/api/submissions/${submissionId}/review`), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -241,7 +242,7 @@ const MentorDashboard = () => {
                           <Button variant="outline" size="sm" onClick={() => {
                             if (selectedSubmission?.fileUrl) {
                               // If fileUrl is a download endpoint, use it directly
-                              window.open(`http://localhost:4000${selectedSubmission.fileUrl}`, '_blank');
+                              window.open(`${getApiUrl('')}${selectedSubmission.fileUrl}`, '_blank');
                             } else {
                               toast({ title: 'No file uploaded', description: 'This submission does not have a file to download.', variant: 'destructive' });
                             }

@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Eye, EyeOff, User, Lock } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
+import { getApiUrl } from '@/config/api';
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -24,7 +25,7 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:4000/api/users/login', {
+      const response = await fetch(getApiUrl('/api/users/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -53,7 +54,7 @@ const Login = () => {
 
   const handleMentorLogin = async () => {
     try {
-      const response = await fetch('http://localhost:4000/api/users/login', {
+      const response = await fetch(getApiUrl('/api/users/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -214,7 +215,7 @@ const Login = () => {
                   }
                   
                   try {
-                    const response = await fetch('http://localhost:4000/api/users/forgot-password', {
+                    const response = await fetch(getApiUrl('/api/users/forgot-password'), {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({ email: forgotEmail })
