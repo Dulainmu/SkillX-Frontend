@@ -60,6 +60,7 @@ Your Railway backend should have these endpoints:
    - `GET /api/recommendations/careers` (fallback for general recommendations)
    - `GET /api/careers/:id` (for specific career details)
    - `GET /api/careers/:id/roadmap` (for detailed career roadmap)
+   - `GET /api/careers/:id/skills` (for career skills and learning resources)
 
 4. **Progress Tracking:**
    - `GET /api/progress/:careerId`

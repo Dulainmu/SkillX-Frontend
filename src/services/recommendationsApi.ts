@@ -74,5 +74,34 @@ export const recommendationsApi = {
       console.error('Error fetching career by ID:', error);
       throw error;
     }
+  },
+
+  async getCareerSkills(careerId: string): Promise<{ career: CareerRecommendation; skills: any[] } | null> {
+    try {
+      const token = getAuthToken();
+      
+      if (token) {
+        try {
+          const response = await fetch(getApiUrl(`/api/careers/${careerId}/skills`), {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            return data;
+          }
+        } catch (error) {
+          console.log('Skills endpoint not available');
+        }
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error fetching career skills:', error);
+      throw error;
+    }
   }
 };

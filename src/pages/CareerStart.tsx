@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { LoadingSpinner } from '@/components/quiz/LoadingSpinner';
 import { CareerRecommendation } from '@/types/recommendations';
 import { recommendationsApi } from '@/services/recommendationsApi';
+import { getApiUrl, getAuthToken } from '@/config/api';
 import { useToast } from '@/hooks/use-toast';
 import { useCareer } from '@/contexts/CareerContext';
 import { 
@@ -49,18 +50,36 @@ const CareerStart = () => {
     const fetchCareerDetails = async () => {
       try {
         setIsLoading(true);
+        
+        // Try to fetch detailed career data with skills from server
+        const skillsData = await recommendationsApi.getCareerSkills(careerId!);
+        
+        if (skillsData) {
+          console.log('Career skills data from server:', skillsData);
+          setCareer(skillsData.career);
+          setSkills(skillsData.skills);
+          return;
+        }
+        
+        // Fallback to general recommendations
         const recommendations = await recommendationsApi.getRecommendations();
         const foundCareer = recommendations.find(c => c.id === careerId);
         
         if (foundCareer) {
           setCareer(foundCareer);
           setSkills(generateSkillsData(foundCareer.name));
+        } else {
+          toast({
+            title: "Career Not Found",
+            description: "The requested career path could not be found.",
+            variant: "destructive",
+          });
         }
       } catch (error) {
         console.error('Failed to load career details:', error);
         toast({
           title: "Error",
-          description: "Failed to load career details.",
+          description: "Failed to load career details. Please try again.",
           variant: "destructive",
         });
       } finally {
