@@ -14,7 +14,6 @@ import { useCareer } from '@/contexts/CareerContext';
 import { 
   ArrowLeft, 
   BookOpen, 
-  ExternalLink,
   Play,
   Clock,
   Star,
@@ -312,9 +311,7 @@ const CareerStart = () => {
                               </div>
                             </div>
                           </div>
-                          <Button variant="ghost" size="sm">
-                            <ExternalLink className="w-4 h-4" />
-                          </Button>
+
                         </div>
                       ))}
                     </div>
