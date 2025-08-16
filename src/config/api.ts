@@ -1,6 +1,8 @@
 //src/config/api.ts
 // API Configuration
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+const isProduction = import.meta.env.MODE === 'production';
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 
+  (isProduction ? 'https://skillx-backend-production.up.railway.app' : 'http://localhost:4000');
 
 // Helper function to get full API URL
 export const getApiUrl = (endpoint: string) => {
@@ -22,8 +24,8 @@ export const getAuthToken = () => {
 export const authenticatedFetch = async (endpoint: string, options: RequestInit = {}) => {
   const token = getAuthToken();
   
-  // Use relative URL since we have proxy configured
-  const url = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  // Use absolute URL for production, relative for development
+  const url = endpoint.startsWith('http') ? endpoint : getApiUrl(endpoint);
   
   const config: RequestInit = {
     ...options,
@@ -51,7 +53,7 @@ export const authenticatedFetch = async (endpoint: string, options: RequestInit 
     } catch (parseError) {
       errorData = { message: `HTTP error! status: ${response.status}` };
     }
-    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+    throw new Error((errorData as any).message || `HTTP error! status: ${response.status}`);
   }
   
   // Try to parse as JSON, but handle non-JSON responses gracefully

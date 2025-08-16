@@ -380,39 +380,23 @@ export const getSkillRecommendations = (userId: string, params?: Record<string, 
 
 // Get skill categories
 export const getSkillCategories = async () => {
-  const response = await fetch('/api/skills/categories');
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  return response.json();
+  return authenticatedFetch('/api/skills/categories');
 };
 
 // Search skills
 export const searchSkills = async (params?: Record<string, string>) => {
   const queryString = params && Object.keys(params).length > 0 ? `?${new URLSearchParams(params).toString()}` : '';
-  const response = await fetch(`/api/skills/search${queryString}`);
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  return response.json();
+  return authenticatedFetch(`/api/skills/search${queryString}`);
 };
 
 // Get skills by category
 export const getSkillsByCategory = async (category: string) => {
-  const response = await fetch(`/api/skills/category/${category}`);
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  return response.json();
+  return authenticatedFetch(`/api/skills/category/${category}`);
 };
 
 // Get a specific skill (public)
 export const getPublicSkill = async (id: string) => {
-  const response = await fetch(`/api/skills/${id}`);
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  return response.json();
+  return authenticatedFetch(`/api/skills/${id}`);
 };
 
 // ===== HELPER FUNCTIONS =====
