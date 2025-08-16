@@ -283,49 +283,349 @@ export const Results: React.FC<ResultsProps> = ({ data, onPrevious, canGoBack })
                 </div>
             </div>
 
-            {/* Personality transparency */}
-            {profile && (
-                <Card className="p-6">
-                    <h3 className="text-2xl font-bold mb-4 flex items-center">
-                        <span className="mr-2">🧭</span> Your Profile Snapshot
-                    </h3>
+            {/* Enhanced Personality & Skills Analysis */}
+            <div className="space-y-6">
+                {/* Personality Analysis */}
+                {profile && (
+                    <Card className="p-6">
+                        <h3 className="text-2xl font-bold mb-6 flex items-center">
+                            <span className="mr-2">🧭</span> Your Personality Profile
+                        </h3>
 
-                    <div className="grid md:grid-cols-3 gap-6">
-                        {/* Big Five */}
-                        <div>
-                            <h4 className="font-semibold mb-3">Big Five</h4>
-                            <div className="space-y-2">
-                                {Object.entries(profile.BigFive).map(([k, v]) => (
-                                    <PercentBar key={k} label={k} value={v as number} />
-                                ))}
+                        <div className="grid md:grid-cols-3 gap-6">
+                            {/* Big Five */}
+                            <div>
+                                <h4 className="font-semibold mb-3 text-lg">Big Five Personality Traits</h4>
+                                <div className="space-y-3">
+                                    {Object.entries(profile.BigFive).map(([trait, value]) => {
+                                        const percentage = Math.round((value as number) * 100);
+                                        const getTraitDescription = (traitName: string, score: number) => {
+                                                                                         const descriptions: Record<string, Record<string, string>> = {
+                                                 'Openness': {
+                                                     high: 'You are curious, creative, and open to new experiences. Great for innovative roles!',
+                                                     medium: 'You balance tradition with new ideas. Adaptable to various work environments.',
+                                                     low: 'You prefer structure and proven methods. Excellent for roles requiring consistency.'
+                                                 },
+                                                 'Conscientiousness': {
+                                                     high: 'You are organized, responsible, and detail-oriented. Perfect for leadership roles!',
+                                                     medium: 'You are reliable and can adapt your work style as needed.',
+                                                     low: 'You are flexible and spontaneous. Great for creative and dynamic roles.'
+                                                 },
+                                                 'Extraversion': {
+                                                     high: 'You are outgoing, energetic, and social. Excellent for client-facing roles!',
+                                                     medium: 'You can work well both independently and in teams.',
+                                                     low: 'You are thoughtful and prefer focused work. Great for analytical roles.'
+                                                 },
+                                                 'Agreeableness': {
+                                                     high: 'You are cooperative, trusting, and empathetic. Perfect for team collaboration!',
+                                                     medium: 'You can balance cooperation with assertiveness when needed.',
+                                                     low: 'You are direct and competitive. Great for roles requiring strong decision-making.'
+                                                 },
+                                                 'Neuroticism': {
+                                                     high: 'You may experience stress more easily. Consider roles with clear structure.',
+                                                     medium: 'You handle stress reasonably well in most situations.',
+                                                     low: 'You are emotionally stable and handle pressure well. Great for high-stress roles!'
+                                                 }
+                                             };
+                                             const level = score > 0.7 ? 'high' : score > 0.4 ? 'medium' : 'low';
+                                             return descriptions[traitName]?.[level] || 'This trait influences your work style.';
+                                        };
+                                        
+                                        return (
+                                            <div key={trait} className="p-3 rounded-lg border border-gray-200">
+                                                <div className="flex justify-between items-center mb-2">
+                                                    <span className="font-medium text-sm">{trait}</span>
+                                                    <span className="text-xs text-muted-foreground">{percentage}%</span>
+                                                </div>
+                                                <div className="w-full h-2 bg-gray-200 rounded">
+                                                    <div 
+                                                        className="h-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded" 
+                                                        style={{ width: `${percentage}%` }} 
+                                                    />
+                                                </div>
+                                                <p className="text-xs text-gray-600 mt-2">
+                                                    {getTraitDescription(trait, value as number)}
+                                                </p>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* RIASEC */}
+                            <div>
+                                <h4 className="font-semibold mb-3 text-lg">Career Interests (RIASEC)</h4>
+                                <div className="space-y-3">
+                                    {Object.entries(profile.RIASEC).map(([interest, value]) => {
+                                        const percentage = Math.round((value as number) * 100);
+                                        const getInterestDescription = (interestName: string) => {
+                                            const descriptions = {
+                                                'Realistic': 'You enjoy working with things, machines, tools, or outdoors.',
+                                                'Investigative': 'You like to observe, learn, investigate, analyze, evaluate, or solve problems.',
+                                                'Artistic': 'You prefer to work with ideas, and express yourself through art, music, or writing.',
+                                                'Social': 'You enjoy working with people, helping, teaching, or serving others.',
+                                                'Enterprising': 'You like to work with people, influence, persuade, lead, or manage.',
+                                                'Conventional': 'You prefer to work with data, have clerical or numerical ability.'
+                                            };
+                                            return descriptions[interestName as keyof typeof descriptions] || 'This interest area may influence your career satisfaction.';
+                                        };
+                                        
+                                        return (
+                                            <div key={interest} className="p-3 rounded-lg border border-gray-200">
+                                                <div className="flex justify-between items-center mb-2">
+                                                    <span className="font-medium text-sm">{interest}</span>
+                                                    <span className="text-xs text-muted-foreground">{percentage}%</span>
+                                                </div>
+                                                <div className="w-full h-2 bg-gray-200 rounded">
+                                                    <div 
+                                                        className="h-2 bg-gradient-to-r from-green-500 to-teal-600 rounded" 
+                                                        style={{ width: `${percentage}%` }} 
+                                                    />
+                                                </div>
+                                                <p className="text-xs text-gray-600 mt-2">
+                                                    {getInterestDescription(interest)}
+                                                </p>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* Work Values */}
+                            <div>
+                                <h4 className="font-semibold mb-3 text-lg">Work Values</h4>
+                                <div className="space-y-2">
+                                    {Object.entries(profile.WorkValues).map(([value, score]) => (
+                                        <div key={value} className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+                                            <div className="flex justify-between items-center">
+                                                <span className="font-medium text-sm">{value}</span>
+                                                <span className="text-xs text-muted-foreground">{score}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
+                    </Card>
+                )}
 
-                        {/* RIASEC */}
-                        <div>
-                            <h4 className="font-semibold mb-3">RIASEC</h4>
-                            <div className="space-y-2">
-                                {Object.entries(profile.RIASEC).map(([k, v]) => (
-                                    <PercentBar key={k} label={k} value={v as number / 1} />
-                                ))}
+                {/* Current Skills Analysis */}
+                {data.skills && (
+                    <Card className="p-6">
+                        <h3 className="text-2xl font-bold mb-6 flex items-center">
+                            <span className="mr-2">⚡</span> Your Current Skills Assessment
+                        </h3>
+
+                        <div className="grid md:grid-cols-2 gap-6">
+                            {/* Skills Overview */}
+                            <div>
+                                <h4 className="font-semibold mb-4 text-lg">Skills Overview</h4>
+                                <div className="space-y-4">
+                                    {Object.entries(data.skills).map(([skillName, skillData]: [string, any]) => {
+                                        if (!skillData.selected || skillData.level === 0) return null;
+                                        
+                                        const getLevelDescription = (level: number) => {
+                                            const descriptions = {
+                                                1: 'Beginner - Basic understanding, can follow tutorials',
+                                                2: 'Intermediate - Can work on projects independently',
+                                                3: 'Advanced - Can handle complex projects and mentor beginners',
+                                                4: 'Expert - Can architect solutions and lead teams'
+                                            };
+                                            return descriptions[level as keyof typeof descriptions] || 'Skill level assessed';
+                                        };
+
+                                        const getLevelColor = (level: number) => {
+                                            const colors = {
+                                                1: 'from-blue-400 to-blue-600',
+                                                2: 'from-green-400 to-green-600',
+                                                3: 'from-purple-400 to-purple-600',
+                                                4: 'from-orange-400 to-orange-600'
+                                            };
+                                            return colors[level as keyof typeof colors] || 'from-gray-400 to-gray-600';
+                                        };
+
+                                        return (
+                                            <div key={skillName} className="p-4 rounded-lg border border-gray-200">
+                                                <div className="flex justify-between items-center mb-2">
+                                                    <span className="font-medium">{skillName}</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-sm font-semibold">Level {skillData.level}</span>
+                                                        <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${getLevelColor(skillData.level)}`}></div>
+                                                    </div>
+                                                </div>
+                                                <div className="w-full h-2 bg-gray-200 rounded mb-2">
+                                                    <div 
+                                                        className={`h-2 bg-gradient-to-r ${getLevelColor(skillData.level)} rounded`}
+                                                        style={{ width: `${(skillData.level / 4) * 100}%` }}
+                                                    />
+                                                </div>
+                                                <p className="text-xs text-gray-600">
+                                                    {getLevelDescription(skillData.level)}
+                                                </p>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* Learning Recommendations */}
+                            <div>
+                                <h4 className="font-semibold mb-4 text-lg">Learning Recommendations</h4>
+                                <div className="space-y-4">
+                                    {Object.entries(data.skills).map(([skillName, skillData]: [string, any]) => {
+                                        if (!skillData.selected || skillData.level === 0) return null;
+                                        
+                                        const getNextLevelTarget = (currentLevel: number) => {
+                                            if (currentLevel >= 4) return 'Master level achieved!';
+                                            const nextLevel = currentLevel + 1;
+                                            const targets = {
+                                                2: 'Focus on independent project work and problem-solving',
+                                                3: 'Work on complex projects and start mentoring others',
+                                                4: 'Lead teams and architect solutions'
+                                            };
+                                            return targets[nextLevel as keyof typeof targets] || 'Continue building experience';
+                                        };
+
+                                        const getEstimatedTime = (currentLevel: number) => {
+                                            const estimates = {
+                                                1: '3-6 months',
+                                                2: '6-12 months',
+                                                3: '12-18 months'
+                                            };
+                                            return estimates[currentLevel as keyof typeof estimates] || 'Varies';
+                                        };
+
+                                        return (
+                                            <div key={skillName} className="p-4 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200">
+                                                <div className="flex justify-between items-center mb-2">
+                                                    <span className="font-medium text-blue-900">{skillName}</span>
+                                                    <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
+                                                        Level {skillData.level} → {skillData.level < 4 ? skillData.level + 1 : 'Master'}
+                                                    </span>
+                                                </div>
+                                                <p className="text-sm text-blue-800 mb-2">
+                                                    {getNextLevelTarget(skillData.level)}
+                                                </p>
+                                                <div className="flex justify-between items-center text-xs text-blue-600">
+                                                    <span>Estimated time: {getEstimatedTime(skillData.level)}</span>
+                                                    <span>Focus on: {skillData.level < 4 ? 'Advanced concepts' : 'Leadership'}</span>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
                             </div>
                         </div>
+                    </Card>
+                )}
+            </div>
 
-                        {/* Work Values */}
-                        <div>
-                            <h4 className="font-semibold mb-3">Work Values</h4>
-                            <div className="grid grid-cols-2 gap-2">
-                                {Object.entries(profile.WorkValues).map(([k, v]) => (
-                                    <div key={k} className="text-xs p-2 rounded bg-primary/5 flex items-center justify-between">
-                                        <span className="font-medium">{k}</span>
-                                        <span className="text-muted-foreground">{v}</span>
-                                    </div>
-                                ))}
+            {/* Assessment Summary */}
+            <Card className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200">
+                <h3 className="text-2xl font-bold mb-6 flex items-center">
+                    <span className="mr-2">📊</span> Assessment Summary
+                </h3>
+                
+                <div className="grid md:grid-cols-4 gap-6">
+                    {/* Quiz Completion */}
+                    <div className="text-center p-4 bg-white rounded-lg border border-blue-100">
+                        <div className="text-3xl font-bold text-blue-600 mb-2">
+                            {data?.answers ? Object.keys(data.answers).length : 32}
+                        </div>
+                        <div className="text-sm text-gray-600">Personality Questions</div>
+                        <div className="text-xs text-green-600 mt-1">✓ Completed</div>
+                    </div>
+
+                    {/* Skills Assessed */}
+                    <div className="text-center p-4 bg-white rounded-lg border border-blue-100">
+                        <div className="text-3xl font-bold text-green-600 mb-2">
+                            {data?.skills ? Object.values(data.skills).filter((s: any) => s.selected && s.level > 0).length : 0}
+                        </div>
+                        <div className="text-sm text-gray-600">Skills Assessed</div>
+                        <div className="text-xs text-blue-600 mt-1">Levels: 1-4</div>
+                    </div>
+
+                    {/* Average Skill Level */}
+                    <div className="text-center p-4 bg-white rounded-lg border border-blue-100">
+                        <div className="text-3xl font-bold text-purple-600 mb-2">
+                            {(() => {
+                                const skills = data?.skills ? Object.values(data.skills).filter((s: any) => s.selected && s.level > 0) : [];
+                                if (skills.length === 0) return '0';
+                                const total = skills.reduce((sum: number, skill: any) => sum + skill.level, 0);
+                                return (total / skills.length).toFixed(1);
+                            })()}
+                        </div>
+                        <div className="text-sm text-gray-600">Avg Skill Level</div>
+                        <div className="text-xs text-purple-600 mt-1">Out of 4</div>
+                    </div>
+
+                    {/* Career Matches */}
+                    <div className="text-center p-4 bg-white rounded-lg border border-blue-100">
+                        <div className="text-3xl font-bold text-orange-600 mb-2">
+                            {topMatches.length}
+                        </div>
+                        <div className="text-sm text-gray-600">Career Matches</div>
+                        <div className="text-xs text-orange-600 mt-1">Personalized</div>
+                    </div>
+                </div>
+
+                {/* Key Insights */}
+                <div className="mt-6 p-4 bg-white rounded-lg border border-blue-100">
+                    <h4 className="font-semibold mb-3 text-gray-800">Key Insights</h4>
+                    <div className="grid md:grid-cols-2 gap-4 text-sm">
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                                <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                <span className="text-gray-700">
+                                    <strong>Personality:</strong> {(() => {
+                                        if (!profile?.BigFive) return 'Analysis complete';
+                                        const traits = Object.entries(profile.BigFive);
+                                                                        const highest = traits.reduce((max, [trait, value]) => 
+                                    (value as number) > (max[1] as number) ? [trait, value] : max, traits[0] as [string, number]);
+                                        return `${highest[0]} is your strongest trait`;
+                                    })()}
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                                <span className="text-gray-700">
+                                    <strong>Interests:</strong> {(() => {
+                                        if (!profile?.RIASEC) return 'Analysis complete';
+                                        const interests = Object.entries(profile.RIASEC);
+                                                                        const highest = interests.reduce((max, [interest, value]) => 
+                                    (value as number) > (max[1] as number) ? [interest, value] : max, interests[0] as [string, number]);
+                                        return `${highest[0]} work environments suit you best`;
+                                    })()}
+                                </span>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                                <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                                <span className="text-gray-700">
+                                    <strong>Skills:</strong> {(() => {
+                                        const skills = data?.skills ? Object.values(data.skills).filter((s: any) => s.selected && s.level > 0) : [];
+                                        if (skills.length === 0) return 'No skills assessed';
+                                        const advanced = skills.filter((s: any) => s.level >= 3).length;
+                                        return `${advanced} advanced skills, ${skills.length - advanced} developing`;
+                                    })()}
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
+                                <span className="text-gray-700">
+                                    <strong>Growth:</strong> {(() => {
+                                        const skills = data?.skills ? Object.values(data.skills).filter((s: any) => s.selected && s.level > 0) : [];
+                                        if (skills.length === 0) return 'Ready to learn';
+                                        const canAdvance = skills.filter((s: any) => s.level < 4).length;
+                                        return `${canAdvance} skills ready for advancement`;
+                                    })()}
+                                </span>
                             </div>
                         </div>
                     </div>
-                </Card>
-            )}
+                </div>
+            </Card>
 
             {/* Top Matches */}
             <div className="grid gap-6 max-w-4xl mx-auto">
