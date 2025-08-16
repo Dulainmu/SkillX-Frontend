@@ -40,6 +40,12 @@ export interface BackendPath {
     currentRole: BackendRoleSnapshot;
     nextRole?: BackendRoleSnapshot;
     roles?: BackendRoleSnapshot[];
+    requiredSkills?: Array<{
+        skillId: string;
+        skillName: string;
+        requiredLevel: number;
+        importance: 'essential' | 'important' | 'nice-to-have';
+    }>;
 }
 
 export interface BackendProfile {

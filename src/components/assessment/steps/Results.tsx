@@ -414,12 +414,19 @@ export const Results: React.FC<ResultsProps> = ({ data, onNext, onPrevious, canG
                 {/* Career Matches with Skills Analysis */}
                 <div className="space-y-8">
                     {topMatches.map((match, index) => {
-                        // Get skills relevant to this career path
-                        const careerSkills = data.skills ? Object.entries(data.skills).filter(([skillName, skillData]: [string, any]) => {
-                            if (!skillData.selected || skillData.level === 0) return false;
-                            // Check if this skill is relevant to the career path
-                            // For now, we'll show all selected skills, but this could be enhanced with career-specific filtering
-                            return true;
+                        // Get the career path details to access required skills
+                        const careerPath = pathsById[match.pathId] || findPathById(backend?.paths, match.pathId);
+                        
+                        // Get only the skills that are required for this specific career path
+                        const careerSkills = careerPath?.requiredSkills ? careerPath.requiredSkills.map((requiredSkill: any) => {
+                            const userSkill = data.skills ? data.skills[requiredSkill.skillName] : null;
+                            return {
+                                skillName: requiredSkill.skillName,
+                                requiredLevel: requiredSkill.requiredLevel,
+                                importance: requiredSkill.importance,
+                                userLevel: userSkill?.selected ? userSkill.level : 0,
+                                hasSkill: userSkill?.selected && userSkill.level > 0
+                            };
                         }) : [];
 
                         const getLevelDescription = (level: number) => {
@@ -503,30 +510,48 @@ export const Results: React.FC<ResultsProps> = ({ data, onNext, onPrevious, canG
                                         </h4>
                                         
                                         <div className="grid md:grid-cols-2 gap-6">
-                                            {/* Current Skills */}
+                                            {/* Required Skills for this Career */}
                                             <div>
-                                                <h5 className="font-semibold mb-3 text-lg">Your Current Skills</h5>
+                                                <h5 className="font-semibold mb-3 text-lg">Required Skills for {match.name}</h5>
                                                 <div className="space-y-3">
-                                                    {careerSkills.map(([skillName, skillData]: [string, any]) => (
-                                                        <div key={skillName} className="p-3 rounded-lg border border-gray-200">
+                                                    {careerSkills.length > 0 ? careerSkills.map((skill: any) => (
+                                                        <div key={skill.skillName} className="p-3 rounded-lg border border-gray-200">
                                                             <div className="flex justify-between items-center mb-2">
-                                                                <span className="font-medium text-sm">{skillName}</span>
                                                                 <div className="flex items-center gap-2">
-                                                                    <span className="text-xs font-semibold">Level {skillData.level}</span>
-                                                                    <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${getLevelColor(skillData.level)}`}></div>
+                                                                    <span className="font-medium text-sm">{skill.skillName}</span>
+                                                                    <span className={`text-xs px-2 py-1 rounded ${
+                                                                        skill.importance === 'essential' ? 'bg-red-100 text-red-700' :
+                                                                        skill.importance === 'important' ? 'bg-yellow-100 text-yellow-700' :
+                                                                        'bg-blue-100 text-blue-700'
+                                                                    }`}>
+                                                                        {skill.importance}
+                                                                    </span>
+                                                                </div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-xs font-semibold">
+                                                                        {skill.hasSkill ? `Level ${skill.userLevel}` : 'Not assessed'}
+                                                                    </span>
+                                                                    {skill.hasSkill && (
+                                                                        <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${getLevelColor(skill.userLevel)}`}></div>
+                                                                    )}
                                                                 </div>
                                                             </div>
                                                             <div className="w-full h-1.5 bg-gray-200 rounded mb-1">
                                                                 <div 
-                                                                    className={`h-1.5 bg-gradient-to-r ${getLevelColor(skillData.level)} rounded`}
-                                                                    style={{ width: `${(skillData.level / 4) * 100}%` }}
+                                                                    className={`h-1.5 bg-gradient-to-r ${skill.hasSkill ? getLevelColor(skill.userLevel) : 'from-gray-400 to-gray-600'} rounded`}
+                                                                    style={{ width: `${skill.hasSkill ? (skill.userLevel / 4) * 100 : 0}%` }}
                                                                 />
                                                             </div>
-                                                            <p className="text-xs text-gray-600">
-                                                                {getLevelDescription(skillData.level)}
-                                                            </p>
+                                                            <div className="flex justify-between items-center text-xs text-gray-600">
+                                                                <span>Required: Level {skill.requiredLevel}</span>
+                                                                <span>{skill.hasSkill ? getLevelDescription(skill.userLevel) : 'Not assessed yet'}</span>
+                                                            </div>
                                                         </div>
-                                                    ))}
+                                                    )) : (
+                                                        <div className="p-3 rounded-lg border border-gray-200 bg-gray-50">
+                                                            <p className="text-sm text-gray-600">No specific skills defined for this career path yet.</p>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
 
@@ -534,23 +559,42 @@ export const Results: React.FC<ResultsProps> = ({ data, onNext, onPrevious, canG
                                             <div>
                                                 <h5 className="font-semibold mb-3 text-lg">Learning Recommendations</h5>
                                                 <div className="space-y-3">
-                                                    {careerSkills.map(([skillName, skillData]: [string, any]) => (
-                                                        <div key={skillName} className="p-3 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200">
+                                                    {careerSkills.length > 0 ? careerSkills.map((skill: any) => (
+                                                        <div key={skill.skillName} className="p-3 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200">
                                                             <div className="flex justify-between items-center mb-1">
-                                                                <span className="font-medium text-blue-900 text-sm">{skillName}</span>
+                                                                <span className="font-medium text-blue-900 text-sm">{skill.skillName}</span>
                                                                 <span className="text-xs text-blue-600 bg-blue-100 px-2 py-0.5 rounded">
-                                                                    Level {skillData.level} → {skillData.level < 4 ? skillData.level + 1 : 'Master'}
+                                                                    {skill.hasSkill ? 
+                                                                        `Level ${skill.userLevel} → ${skill.userLevel < skill.requiredLevel ? skill.requiredLevel : 'Target'}`
+                                                                        : `Target: Level ${skill.requiredLevel}`
+                                                                    }
                                                                 </span>
                                                             </div>
                                                             <p className="text-xs text-blue-800 mb-1">
-                                                                {getNextLevelTarget(skillData.level)}
+                                                                {skill.hasSkill ? 
+                                                                    (skill.userLevel >= skill.requiredLevel ? 
+                                                                        'Skill requirement met! 🎉' : 
+                                                                        `Need ${skill.requiredLevel - skill.userLevel} more level(s)`
+                                                                    ) : 
+                                                                    `Start learning ${skill.skillName} to reach Level ${skill.requiredLevel}`
+                                                                }
                                                             </p>
                                                             <div className="flex justify-between items-center text-xs text-blue-600">
-                                                                <span>Time: {getEstimatedTime(skillData.level)}</span>
-                                                                <span>Focus: {skillData.level < 4 ? 'Advanced concepts' : 'Leadership'}</span>
+                                                                <span>Required: Level {skill.requiredLevel}</span>
+                                                                <span className={`${
+                                                                    skill.importance === 'essential' ? 'text-red-600' :
+                                                                    skill.importance === 'important' ? 'text-yellow-600' :
+                                                                    'text-blue-600'
+                                                                }`}>
+                                                                    {skill.importance}
+                                                                </span>
                                                             </div>
                                                         </div>
-                                                    ))}
+                                                    )) : (
+                                                        <div className="p-3 rounded-lg bg-gray-50 border border-gray-200">
+                                                            <p className="text-sm text-gray-600">No specific learning recommendations available.</p>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
@@ -568,7 +612,7 @@ export const Results: React.FC<ResultsProps> = ({ data, onNext, onPrevious, canG
                                                 <div className="text-center">
                                                     <div className="text-lg font-bold text-green-600">
                                                         {(() => {
-                                                            const skills = careerSkills.filter(([_, skillData]: [string, any]) => skillData.level >= 2);
+                                                            const skills = careerSkills.filter((skill: any) => skill.hasSkill && skill.userLevel >= 2);
                                                             return skills.length;
                                                         })()}
                                                     </div>
@@ -577,7 +621,7 @@ export const Results: React.FC<ResultsProps> = ({ data, onNext, onPrevious, canG
                                                 <div className="text-center">
                                                     <div className="text-lg font-bold text-purple-600">
                                                         {(() => {
-                                                            const skills = careerSkills.filter(([_, skillData]: [string, any]) => skillData.level >= 3);
+                                                            const skills = careerSkills.filter((skill: any) => skill.hasSkill && skill.userLevel >= 3);
                                                             return skills.length;
                                                         })()}
                                                     </div>
