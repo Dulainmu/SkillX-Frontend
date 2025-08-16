@@ -120,7 +120,7 @@ function resolveCurrentRoleTitleLevel(
     return { title: '-', level: '-' };
 }
 
-export const Results: React.FC<ResultsProps> = ({ data, onPrevious, canGoBack }) => {
+export const Results: React.FC<ResultsProps> = ({ data, onNext, onPrevious, canGoBack }) => {
     const navigate = useNavigate();
     const [backend, setBackend] = useState<BackendRecommendationsResponse | null>(data.backend || null);
     const [loading, setLoading] = useState(!data.backend);
@@ -209,7 +209,7 @@ export const Results: React.FC<ResultsProps> = ({ data, onPrevious, canGoBack })
                 </div>
                 <div className="text-center space-y-2">
                     <h2 className="text-2xl font-bold">Analyzing your profile…</h2>
-                    <p>We’re matching your skills and preferences with career opportunities</p>
+                    <p>We're matching your skills and preferences with career opportunities</p>
                 </div>
             </div>
         );
@@ -245,6 +245,7 @@ export const Results: React.FC<ResultsProps> = ({ data, onPrevious, canGoBack })
         setSelectedPath(pathsById[career.pathId] || findPathById(backend?.paths, career.pathId) || null);
         setShowModal(true);
     };
+    
     const handleStartCareerPath = () => {
         if (selectedCareer) {
             navigate(`/career-roadmap/${selectedCareer.pathId}`);
@@ -272,6 +273,7 @@ export const Results: React.FC<ResultsProps> = ({ data, onPrevious, canGoBack })
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+            
             {/* Header */}
             <div className="text-center space-y-4">
                 <h2 className="text-3xl font-bold">Your Career Matches</h2>
@@ -590,112 +592,113 @@ export const Results: React.FC<ResultsProps> = ({ data, onPrevious, canGoBack })
                     })}
                 </div>
 
-            {/* Assessment Summary */}
-            <Card className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200">
-                <h3 className="text-2xl font-bold mb-6 flex items-center">
-                    <span className="mr-2">📊</span> Assessment Summary
-                </h3>
-                
-                <div className="grid md:grid-cols-4 gap-6">
-                    {/* Quiz Completion */}
-                    <div className="text-center p-4 bg-white rounded-lg border border-blue-100">
-                        <div className="text-3xl font-bold text-blue-600 mb-2">
-                            {data?.answers ? Object.keys(data.answers).length : 32}
+                {/* Assessment Summary */}
+                <Card className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200">
+                    <h3 className="text-2xl font-bold mb-6 flex items-center">
+                        <span className="mr-2">📊</span> Assessment Summary
+                    </h3>
+                    
+                    <div className="grid md:grid-cols-4 gap-6">
+                        {/* Quiz Completion */}
+                        <div className="text-center p-4 bg-white rounded-lg border border-blue-100">
+                            <div className="text-3xl font-bold text-blue-600 mb-2">
+                                {data?.answers ? Object.keys(data.answers).length : 32}
+                            </div>
+                            <div className="text-sm text-gray-600">Personality Questions</div>
+                            <div className="text-xs text-green-600 mt-1">✓ Completed</div>
                         </div>
-                        <div className="text-sm text-gray-600">Personality Questions</div>
-                        <div className="text-xs text-green-600 mt-1">✓ Completed</div>
+
+                        {/* Skills Assessed */}
+                        <div className="text-center p-4 bg-white rounded-lg border border-blue-100">
+                            <div className="text-3xl font-bold text-green-600 mb-2">
+                                {data?.skills ? Object.values(data.skills).filter((s: any) => s.selected && s.level > 0).length : 0}
+                            </div>
+                            <div className="text-sm text-gray-600">Skills Assessed</div>
+                            <div className="text-xs text-blue-600 mt-1">Levels: 1-4</div>
+                        </div>
+
+                        {/* Average Skill Level */}
+                        <div className="text-center p-4 bg-white rounded-lg border border-blue-100">
+                            <div className="text-3xl font-bold text-purple-600 mb-2">
+                                {(() => {
+                                    const skills = data?.skills ? Object.values(data.skills).filter((s: any) => s.selected && s.level > 0) : [];
+                                    if (skills.length === 0) return '0';
+                                    const total = skills.reduce((sum: number, skill: any) => sum + Number(skill.level), 0);
+                                    return (Number(total) / Number(skills.length)).toFixed(1);
+                                })()}
+                            </div>
+                            <div className="text-sm text-gray-600">Avg Skill Level</div>
+                            <div className="text-xs text-purple-600 mt-1">Out of 4</div>
+                        </div>
+
+                        {/* Career Matches */}
+                        <div className="text-center p-4 bg-white rounded-lg border border-blue-100">
+                            <div className="text-3xl font-bold text-orange-600 mb-2">
+                                {topMatches.length}
+                            </div>
+                            <div className="text-sm text-gray-600">Career Matches</div>
+                            <div className="text-xs text-orange-600 mt-1">Personalized</div>
+                        </div>
                     </div>
 
-                    {/* Skills Assessed */}
-                    <div className="text-center p-4 bg-white rounded-lg border border-blue-100">
-                        <div className="text-3xl font-bold text-green-600 mb-2">
-                            {data?.skills ? Object.values(data.skills).filter((s: any) => s.selected && s.level > 0).length : 0}
-                        </div>
-                        <div className="text-sm text-gray-600">Skills Assessed</div>
-                        <div className="text-xs text-blue-600 mt-1">Levels: 1-4</div>
-                    </div>
-
-                    {/* Average Skill Level */}
-                    <div className="text-center p-4 bg-white rounded-lg border border-blue-100">
-                        <div className="text-3xl font-bold text-purple-600 mb-2">
-                            {(() => {
-                                const skills = data?.skills ? Object.values(data.skills).filter((s: any) => s.selected && s.level > 0) : [];
-                                if (skills.length === 0) return '0';
-                                const total = skills.reduce((sum: number, skill: any) => sum + skill.level, 0);
-                                return (total / skills.length).toFixed(1);
-                            })()}
-                        </div>
-                        <div className="text-sm text-gray-600">Avg Skill Level</div>
-                        <div className="text-xs text-purple-600 mt-1">Out of 4</div>
-                    </div>
-
-                    {/* Career Matches */}
-                    <div className="text-center p-4 bg-white rounded-lg border border-blue-100">
-                        <div className="text-3xl font-bold text-orange-600 mb-2">
-                            {topMatches.length}
-                        </div>
-                        <div className="text-sm text-gray-600">Career Matches</div>
-                        <div className="text-xs text-orange-600 mt-1">Personalized</div>
-                    </div>
-                </div>
-
-                {/* Key Insights */}
-                <div className="mt-6 p-4 bg-white rounded-lg border border-blue-100">
-                    <h4 className="font-semibold mb-3 text-gray-800">Key Insights</h4>
-                    <div className="grid md:grid-cols-2 gap-4 text-sm">
-                        <div className="space-y-2">
-                            <div className="flex items-center gap-2">
-                                <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                                <span className="text-gray-700">
-                                    <strong>Personality:</strong> {(() => {
-                                        if (!profile?.BigFive) return 'Analysis complete';
-                                        const traits = Object.entries(profile.BigFive);
-                                                                        const highest = traits.reduce((max: [string, number], [trait, value]) => 
-                                    (value as number) > (max[1] as number) ? [trait, value] : max, traits[0] as [string, number]);
-                                        return `${highest[0]} is your strongest trait`;
-                                    })()}
-                                </span>
+                    {/* Key Insights */}
+                    <div className="mt-6 p-4 bg-white rounded-lg border border-blue-100">
+                        <h4 className="font-semibold mb-3 text-gray-800">Key Insights</h4>
+                        <div className="grid md:grid-cols-2 gap-4 text-sm">
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                    <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                    <span className="text-gray-700">
+                                        <strong>Personality:</strong> {(() => {
+                                            if (!profile?.BigFive) return 'Analysis complete';
+                                            const traits = Object.entries(profile.BigFive);
+                                            const highest = traits.reduce((max, [trait, value]) => 
+                                                Number(value) > Number(max[1]) ? [trait, value] : max, traits[0]);
+                                            return `${highest[0]} is your strongest trait`;
+                                        })()}
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                                    <span className="text-gray-700">
+                                        <strong>Interests:</strong> {(() => {
+                                            if (!profile?.RIASEC) return 'Analysis complete';
+                                            const interests = Object.entries(profile.RIASEC);
+                                            const highest = interests.reduce((max: [string, number], [interest, value]) => 
+                                                (value as number) > (max[1] as number) ? [interest, value] : max, interests[0] as [string, number]);
+                                            return `${highest[0]} work environments suit you best`;
+                                        })()}
+                                    </span>
+                                </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                                <span className="text-gray-700">
-                                    <strong>Interests:</strong> {(() => {
-                                        if (!profile?.RIASEC) return 'Analysis complete';
-                                        const interests = Object.entries(profile.RIASEC);
-                                                                        const highest = interests.reduce((max: [string, number], [interest, value]) => 
-                                    (value as number) > (max[1] as number) ? [interest, value] : max, interests[0] as [string, number]);
-                                        return `${highest[0]} work environments suit you best`;
-                                    })()}
-                                </span>
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <div className="flex items-center gap-2">
-                                <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
-                                <span className="text-gray-700">
-                                    <strong>Skills:</strong> {(() => {
-                                        const skills = data?.skills ? Object.values(data.skills).filter((s: any) => s.selected && s.level > 0) : [];
-                                        if (skills.length === 0) return 'No skills assessed';
-                                        const advanced = skills.filter((s: any) => s.level >= 3).length;
-                                        return `${advanced} advanced skills, ${skills.length - advanced} developing`;
-                                    })()}
-                                </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
-                                <span className="text-gray-700">
-                                    <strong>Growth:</strong> {(() => {
-                                        const skills = data?.skills ? Object.values(data.skills).filter((s: any) => s.selected && s.level > 0) : [];
-                                        if (skills.length === 0) return 'Ready to learn';
-                                        const canAdvance = skills.filter((s: any) => s.level < 4).length;
-                                        return `${canAdvance} skills ready for advancement`;
-                                    })()}
-                                </span>
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                    <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                                    <span className="text-gray-700">
+                                        <strong>Skills:</strong> {(() => {
+                                            const skills = data?.skills ? Object.values(data.skills).filter((s: any) => s.selected && s.level > 0) : [];
+                                            if (skills.length === 0) return 'No skills assessed';
+                                            const advanced = skills.filter((s: any) => s.level >= 3).length;
+                                            return `${advanced} advanced skills, ${skills.length - advanced} developing`;
+                                        })()}
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
+                                    <span className="text-gray-700">
+                                        <strong>Growth:</strong> {(() => {
+                                            const skills = data?.skills ? Object.values(data.skills).filter((s: any) => s.selected && s.level > 0) : [];
+                                            if (skills.length === 0) return 'Ready to learn';
+                                            const canAdvance = skills.filter((s: any) => s.level < 4).length;
+                                            return `${canAdvance} skills ready for advancement`;
+                                        })()}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </Card>
+                </Card>
+            </div>
 
             {/* Top Matches */}
             <div className="grid gap-6 max-w-4xl mx-auto">
@@ -712,7 +715,7 @@ export const Results: React.FC<ResultsProps> = ({ data, onPrevious, canGoBack })
                     const next = m.nextRole || path?.nextRole;
                     const fit = path?.currentRole;
 
-                    // Build transparent “why” bullets
+                    // Build transparent "why" bullets
                     const why: string[] = [];
                     if (typeof fit?.skillFit === 'number') {
                         const s = Math.round((fit.skillFit <= 1 ? fit.skillFit * 100 : fit.skillFit));
@@ -856,4 +859,4 @@ export const Results: React.FC<ResultsProps> = ({ data, onPrevious, canGoBack })
             </div>
         </div>
     );
-};
+}
