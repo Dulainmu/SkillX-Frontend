@@ -300,35 +300,35 @@ export const Results: React.FC<ResultsProps> = ({ data, onPrevious, canGoBack })
                                     {Object.entries(profile.BigFive).map(([trait, value]) => {
                                         const percentage = Math.round((value as number) * 100);
                                         const getTraitDescription = (traitName: string, score: number) => {
-                                                                                         const descriptions: Record<string, Record<string, string>> = {
-                                                 'Openness': {
-                                                     high: 'You are curious, creative, and open to new experiences. Great for innovative roles!',
-                                                     medium: 'You balance tradition with new ideas. Adaptable to various work environments.',
-                                                     low: 'You prefer structure and proven methods. Excellent for roles requiring consistency.'
-                                                 },
-                                                 'Conscientiousness': {
-                                                     high: 'You are organized, responsible, and detail-oriented. Perfect for leadership roles!',
-                                                     medium: 'You are reliable and can adapt your work style as needed.',
-                                                     low: 'You are flexible and spontaneous. Great for creative and dynamic roles.'
-                                                 },
-                                                 'Extraversion': {
-                                                     high: 'You are outgoing, energetic, and social. Excellent for client-facing roles!',
-                                                     medium: 'You can work well both independently and in teams.',
-                                                     low: 'You are thoughtful and prefer focused work. Great for analytical roles.'
-                                                 },
-                                                 'Agreeableness': {
-                                                     high: 'You are cooperative, trusting, and empathetic. Perfect for team collaboration!',
-                                                     medium: 'You can balance cooperation with assertiveness when needed.',
-                                                     low: 'You are direct and competitive. Great for roles requiring strong decision-making.'
-                                                 },
-                                                 'Neuroticism': {
-                                                     high: 'You may experience stress more easily. Consider roles with clear structure.',
-                                                     medium: 'You handle stress reasonably well in most situations.',
-                                                     low: 'You are emotionally stable and handle pressure well. Great for high-stress roles!'
-                                                 }
-                                             };
-                                             const level = score > 0.7 ? 'high' : score > 0.4 ? 'medium' : 'low';
-                                             return descriptions[traitName]?.[level] || 'This trait influences your work style.';
+                                            const descriptions: Record<string, Record<string, string>> = {
+                                                'Openness': {
+                                                    high: 'You are curious, creative, and open to new experiences. Great for innovative roles!',
+                                                    medium: 'You balance tradition with new ideas. Adaptable to various work environments.',
+                                                    low: 'You prefer structure and proven methods. Excellent for roles requiring consistency.'
+                                                },
+                                                'Conscientiousness': {
+                                                    high: 'You are organized, responsible, and detail-oriented. Perfect for leadership roles!',
+                                                    medium: 'You are reliable and can adapt your work style as needed.',
+                                                    low: 'You are flexible and spontaneous. Great for creative and dynamic roles.'
+                                                },
+                                                'Extraversion': {
+                                                    high: 'You are outgoing, energetic, and social. Excellent for client-facing roles!',
+                                                    medium: 'You can work well both independently and in teams.',
+                                                    low: 'You are thoughtful and prefer focused work. Great for analytical roles.'
+                                                },
+                                                'Agreeableness': {
+                                                    high: 'You are cooperative, trusting, and empathetic. Perfect for team collaboration!',
+                                                    medium: 'You can balance cooperation with assertiveness when needed.',
+                                                    low: 'You are direct and competitive. Great for roles requiring strong decision-making.'
+                                                },
+                                                'Neuroticism': {
+                                                    high: 'You may experience stress more easily. Consider roles with clear structure.',
+                                                    medium: 'You handle stress reasonably well in most situations.',
+                                                    low: 'You are emotionally stable and handle pressure well. Great for high-stress roles!'
+                                                }
+                                            };
+                                            const level = score > 0.7 ? 'high' : score > 0.4 ? 'medium' : 'low';
+                                            return descriptions[traitName]?.[level] || 'This trait influences your work style.';
                                         };
                                         
                                         return (
@@ -409,116 +409,186 @@ export const Results: React.FC<ResultsProps> = ({ data, onPrevious, canGoBack })
                     </Card>
                 )}
 
-                {/* Current Skills Analysis */}
-                {data.skills && (
-                    <Card className="p-6">
-                        <h3 className="text-2xl font-bold mb-6 flex items-center">
-                            <span className="mr-2">⚡</span> Your Current Skills Assessment
-                        </h3>
+                {/* Career Matches with Skills Analysis */}
+                <div className="space-y-8">
+                    {topMatches.map((match, index) => {
+                        // Get skills relevant to this career path
+                        const careerSkills = data.skills ? Object.entries(data.skills).filter(([skillName, skillData]: [string, any]) => {
+                            if (!skillData.selected || skillData.level === 0) return false;
+                            // Check if this skill is relevant to the career path
+                            // For now, we'll show all selected skills, but this could be enhanced with career-specific filtering
+                            return true;
+                        }) : [];
 
-                        <div className="grid md:grid-cols-2 gap-6">
-                            {/* Skills Overview */}
-                            <div>
-                                <h4 className="font-semibold mb-4 text-lg">Skills Overview</h4>
-                                <div className="space-y-4">
-                                    {Object.entries(data.skills).map(([skillName, skillData]: [string, any]) => {
-                                        if (!skillData.selected || skillData.level === 0) return null;
+                        const getLevelDescription = (level: number) => {
+                            const descriptions = {
+                                1: 'Beginner - Basic understanding, can follow tutorials',
+                                2: 'Intermediate - Can work on projects independently',
+                                3: 'Advanced - Can handle complex projects and mentor beginners',
+                                4: 'Expert - Can architect solutions and lead teams'
+                            };
+                            return descriptions[level as keyof typeof descriptions] || 'Skill level assessed';
+                        };
+
+                        const getLevelColor = (level: number) => {
+                            const colors = {
+                                1: 'from-blue-400 to-blue-600',
+                                2: 'from-green-400 to-green-600',
+                                3: 'from-purple-400 to-purple-600',
+                                4: 'from-orange-400 to-orange-600'
+                            };
+                            return colors[level as keyof typeof colors] || 'from-gray-400 to-gray-600';
+                        };
+
+                        const getNextLevelTarget = (currentLevel: number) => {
+                            if (currentLevel >= 4) return 'Master level achieved!';
+                            const nextLevel = currentLevel + 1;
+                            const targets = {
+                                2: 'Focus on independent project work and problem-solving',
+                                3: 'Work on complex projects and start mentoring others',
+                                4: 'Lead teams and architect solutions'
+                            };
+                            return targets[nextLevel as keyof typeof targets] || 'Continue building experience';
+                        };
+
+                        const getEstimatedTime = (currentLevel: number) => {
+                            const estimates = {
+                                1: '3-6 months',
+                                2: '6-12 months',
+                                3: '12-18 months'
+                            };
+                            return estimates[currentLevel as keyof typeof estimates] || 'Varies';
+                        };
+
+                        return (
+                            <Card key={match.pathId} className="p-6">
+                                <div className="flex items-start justify-between mb-6">
+                                    <div className="flex-1">
+                                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{match.name}</h3>
+                                        <p className="text-gray-600 mb-4">{match.description}</p>
+                                        <div className="flex items-center gap-6 text-sm">
+                                            <div className="flex items-center gap-2">
+                                                <span className="font-medium">Match Score:</span>
+                                                <span className="text-lg font-bold text-blue-600">{Math.round(match.currentRole.score)}%</span>
+                                            </div>
+                                            {match.averageSalary && (
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-medium">Salary:</span>
+                                                    <span className="text-green-600">{match.averageSalary}</span>
+                                                </div>
+                                            )}
+                                            {match.jobGrowth && (
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-medium">Growth:</span>
+                                                    <span className="text-purple-600">{match.jobGrowth}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <Button 
+                                        onClick={() => handleShowCareerModal(match)}
+                                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                                    >
+                                        View Details
+                                    </Button>
+                                </div>
+
+                                {/* Skills Assessment for this Career */}
+                                {careerSkills.length > 0 && (
+                                    <div className="mt-8">
+                                        <h4 className="text-xl font-bold mb-4 flex items-center">
+                                            <span className="mr-2">⚡</span> Skills Assessment for {match.name}
+                                        </h4>
                                         
-                                        const getLevelDescription = (level: number) => {
-                                            const descriptions = {
-                                                1: 'Beginner - Basic understanding, can follow tutorials',
-                                                2: 'Intermediate - Can work on projects independently',
-                                                3: 'Advanced - Can handle complex projects and mentor beginners',
-                                                4: 'Expert - Can architect solutions and lead teams'
-                                            };
-                                            return descriptions[level as keyof typeof descriptions] || 'Skill level assessed';
-                                        };
+                                        <div className="grid md:grid-cols-2 gap-6">
+                                            {/* Current Skills */}
+                                            <div>
+                                                <h5 className="font-semibold mb-3 text-lg">Your Current Skills</h5>
+                                                <div className="space-y-3">
+                                                    {careerSkills.map(([skillName, skillData]: [string, any]) => (
+                                                        <div key={skillName} className="p-3 rounded-lg border border-gray-200">
+                                                            <div className="flex justify-between items-center mb-2">
+                                                                <span className="font-medium text-sm">{skillName}</span>
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-xs font-semibold">Level {skillData.level}</span>
+                                                                    <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${getLevelColor(skillData.level)}`}></div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="w-full h-1.5 bg-gray-200 rounded mb-1">
+                                                                <div 
+                                                                    className={`h-1.5 bg-gradient-to-r ${getLevelColor(skillData.level)} rounded`}
+                                                                    style={{ width: `${(skillData.level / 4) * 100}%` }}
+                                                                />
+                                                            </div>
+                                                            <p className="text-xs text-gray-600">
+                                                                {getLevelDescription(skillData.level)}
+                                                            </p>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
 
-                                        const getLevelColor = (level: number) => {
-                                            const colors = {
-                                                1: 'from-blue-400 to-blue-600',
-                                                2: 'from-green-400 to-green-600',
-                                                3: 'from-purple-400 to-purple-600',
-                                                4: 'from-orange-400 to-orange-600'
-                                            };
-                                            return colors[level as keyof typeof colors] || 'from-gray-400 to-gray-600';
-                                        };
+                                            {/* Learning Recommendations */}
+                                            <div>
+                                                <h5 className="font-semibold mb-3 text-lg">Learning Recommendations</h5>
+                                                <div className="space-y-3">
+                                                    {careerSkills.map(([skillName, skillData]: [string, any]) => (
+                                                        <div key={skillName} className="p-3 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200">
+                                                            <div className="flex justify-between items-center mb-1">
+                                                                <span className="font-medium text-blue-900 text-sm">{skillName}</span>
+                                                                <span className="text-xs text-blue-600 bg-blue-100 px-2 py-0.5 rounded">
+                                                                    Level {skillData.level} → {skillData.level < 4 ? skillData.level + 1 : 'Master'}
+                                                                </span>
+                                                            </div>
+                                                            <p className="text-xs text-blue-800 mb-1">
+                                                                {getNextLevelTarget(skillData.level)}
+                                                            </p>
+                                                            <div className="flex justify-between items-center text-xs text-blue-600">
+                                                                <span>Time: {getEstimatedTime(skillData.level)}</span>
+                                                                <span>Focus: {skillData.level < 4 ? 'Advanced concepts' : 'Leadership'}</span>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                        return (
-                                            <div key={skillName} className="p-4 rounded-lg border border-gray-200">
-                                                <div className="flex justify-between items-center mb-2">
-                                                    <span className="font-medium">{skillName}</span>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-sm font-semibold">Level {skillData.level}</span>
-                                                        <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${getLevelColor(skillData.level)}`}></div>
+                                        {/* Career Path Summary */}
+                                        <div className="mt-6 p-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg border border-gray-200">
+                                            <h5 className="font-semibold mb-2 text-gray-800">Career Path Summary</h5>
+                                            <div className="grid grid-cols-3 gap-4 text-sm">
+                                                <div className="text-center">
+                                                    <div className="text-lg font-bold text-blue-600">
+                                                        {careerSkills.length}
                                                     </div>
+                                                    <div className="text-xs text-gray-600">Skills Assessed</div>
                                                 </div>
-                                                <div className="w-full h-2 bg-gray-200 rounded mb-2">
-                                                    <div 
-                                                        className={`h-2 bg-gradient-to-r ${getLevelColor(skillData.level)} rounded`}
-                                                        style={{ width: `${(skillData.level / 4) * 100}%` }}
-                                                    />
+                                                <div className="text-center">
+                                                    <div className="text-lg font-bold text-green-600">
+                                                        {(() => {
+                                                            const skills = careerSkills.filter(([_, skillData]: [string, any]) => skillData.level >= 2);
+                                                            return skills.length;
+                                                        })()}
+                                                    </div>
+                                                    <div className="text-xs text-gray-600">Intermediate+</div>
                                                 </div>
-                                                <p className="text-xs text-gray-600">
-                                                    {getLevelDescription(skillData.level)}
-                                                </p>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-
-                            {/* Learning Recommendations */}
-                            <div>
-                                <h4 className="font-semibold mb-4 text-lg">Learning Recommendations</h4>
-                                <div className="space-y-4">
-                                    {Object.entries(data.skills).map(([skillName, skillData]: [string, any]) => {
-                                        if (!skillData.selected || skillData.level === 0) return null;
-                                        
-                                        const getNextLevelTarget = (currentLevel: number) => {
-                                            if (currentLevel >= 4) return 'Master level achieved!';
-                                            const nextLevel = currentLevel + 1;
-                                            const targets = {
-                                                2: 'Focus on independent project work and problem-solving',
-                                                3: 'Work on complex projects and start mentoring others',
-                                                4: 'Lead teams and architect solutions'
-                                            };
-                                            return targets[nextLevel as keyof typeof targets] || 'Continue building experience';
-                                        };
-
-                                        const getEstimatedTime = (currentLevel: number) => {
-                                            const estimates = {
-                                                1: '3-6 months',
-                                                2: '6-12 months',
-                                                3: '12-18 months'
-                                            };
-                                            return estimates[currentLevel as keyof typeof estimates] || 'Varies';
-                                        };
-
-                                        return (
-                                            <div key={skillName} className="p-4 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200">
-                                                <div className="flex justify-between items-center mb-2">
-                                                    <span className="font-medium text-blue-900">{skillName}</span>
-                                                    <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
-                                                        Level {skillData.level} → {skillData.level < 4 ? skillData.level + 1 : 'Master'}
-                                                    </span>
-                                                </div>
-                                                <p className="text-sm text-blue-800 mb-2">
-                                                    {getNextLevelTarget(skillData.level)}
-                                                </p>
-                                                <div className="flex justify-between items-center text-xs text-blue-600">
-                                                    <span>Estimated time: {getEstimatedTime(skillData.level)}</span>
-                                                    <span>Focus on: {skillData.level < 4 ? 'Advanced concepts' : 'Leadership'}</span>
+                                                <div className="text-center">
+                                                    <div className="text-lg font-bold text-purple-600">
+                                                        {(() => {
+                                                            const skills = careerSkills.filter(([_, skillData]: [string, any]) => skillData.level >= 3);
+                                                            return skills.length;
+                                                        })()}
+                                                    </div>
+                                                    <div className="text-xs text-gray-600">Advanced+</div>
                                                 </div>
                                             </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        </div>
-                    </Card>
-                )}
-            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </Card>
+                        );
+                    })}
+                </div>
 
             {/* Assessment Summary */}
             <Card className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200">
@@ -580,7 +650,7 @@ export const Results: React.FC<ResultsProps> = ({ data, onPrevious, canGoBack })
                                     <strong>Personality:</strong> {(() => {
                                         if (!profile?.BigFive) return 'Analysis complete';
                                         const traits = Object.entries(profile.BigFive);
-                                                                        const highest = traits.reduce((max, [trait, value]) => 
+                                                                        const highest = traits.reduce((max: [string, number], [trait, value]) => 
                                     (value as number) > (max[1] as number) ? [trait, value] : max, traits[0] as [string, number]);
                                         return `${highest[0]} is your strongest trait`;
                                     })()}
@@ -592,7 +662,7 @@ export const Results: React.FC<ResultsProps> = ({ data, onPrevious, canGoBack })
                                     <strong>Interests:</strong> {(() => {
                                         if (!profile?.RIASEC) return 'Analysis complete';
                                         const interests = Object.entries(profile.RIASEC);
-                                                                        const highest = interests.reduce((max, [interest, value]) => 
+                                                                        const highest = interests.reduce((max: [string, number], [interest, value]) => 
                                     (value as number) > (max[1] as number) ? [interest, value] : max, interests[0] as [string, number]);
                                         return `${highest[0]} work environments suit you best`;
                                     })()}
