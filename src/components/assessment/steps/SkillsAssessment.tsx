@@ -194,9 +194,11 @@ export const SkillsAssessment: React.FC<SkillsAssessmentProps> = ({
     return out;
   };
 
-  const handleContinue = () => {
-    const normalized = normalizeSkillsForBackend(skills);
-    onNext({ skills: normalized, portfolio });
+  const handleContinue = async () => {
+    if (!isLoading) {
+      const normalized = normalizeSkillsForBackend(skills);
+      await onNext({ skills: normalized, portfolio });
+    }
   };
 
   const getSelectedSkillsCount = () => {
@@ -653,12 +655,22 @@ export const SkillsAssessment: React.FC<SkillsAssessmentProps> = ({
 
             <Button
               onClick={handleContinue}
-              className="px-10 py-3 text-lg font-medium bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 shadow-lg hover:shadow-xl transition-all duration-300 text-white"
+              disabled={isLoading}
+              className="px-10 py-3 text-lg font-medium bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 shadow-lg hover:shadow-xl transition-all duration-300 text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Continue Assessment
-              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                <>
+                  Continue Assessment
+                  <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </>
+              )}
             </Button>
           </div>
 

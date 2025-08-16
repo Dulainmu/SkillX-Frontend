@@ -42,12 +42,27 @@ export const GoalSelection: React.FC<GoalSelectionProps> = ({
   onNext,
   onPrevious,
   canGoBack,
+  isLoading = false,
 }) => {
   const [selectedGoal, setSelectedGoal] = useState<string>(data.goals || '');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleContinue = () => {
-    if (selectedGoal) {
-      onNext({ goals: selectedGoal });
+  const handleContinue = async () => {
+    if (selectedGoal && !isSubmitting && !isLoading) {
+      setIsSubmitting(true);
+      try {
+        await onNext({ goals: selectedGoal });
+      } catch (error) {
+        console.error('Error in handleContinue:', error);
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+  };
+
+  const handleGoalSelect = (goalId: string) => {
+    if (!isSubmitting && !isLoading) {
+      setSelectedGoal(goalId);
     }
   };
 
@@ -83,7 +98,7 @@ export const GoalSelection: React.FC<GoalSelectionProps> = ({
                   ? 'border-primary bg-primary/5' 
                   : 'border-border hover:border-primary'
               }`}
-              onClick={() => setSelectedGoal(goal.id)}
+              onClick={() => handleGoalSelect(goal.id)}
             >
               <div className="text-center space-y-3">
                 <div className="text-2xl">{goal.icon}</div>
@@ -116,9 +131,9 @@ export const GoalSelection: React.FC<GoalSelectionProps> = ({
         
         <Button
           onClick={handleContinue}
-          disabled={!selectedGoal}
+          disabled={!selectedGoal || isSubmitting || isLoading}
         >
-          Continue
+          {isSubmitting || isLoading ? 'Loading...' : 'Continue'}
         </Button>
       </div>
     </div>

@@ -62,8 +62,8 @@ export const Preferences: React.FC<PreferencesProps> = ({
     }));
   };
 
-  const handleContinue = () => {
-    onNext({ preferences });
+  const handleContinue = async () => {
+    await onNext({ preferences });
   };
 
   const renderSelectionGrid = (

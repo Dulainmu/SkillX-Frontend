@@ -222,29 +222,36 @@ export const AssessmentFlow = () => {
   // When step 4 (Preferences) completes, submit the whole payload to backend,
   // save the backend recommendations into `data.backend`, then go to Results.
   const handleNext = async (stepData: any) => {
-    setData(prev => ({ ...prev, ...stepData }));
+    try {
+      // Update data first
+      setData(prev => ({ ...prev, ...stepData }));
 
-    // Validate current step before proceeding
-    const validation = validateCurrentStep();
-    if (!validation.isValid) {
-      setValidationErrors(prev => ({ ...prev, [currentStep]: validation.message }));
-      return;
-    }
+      // Validate current step before proceeding
+      const validation = validateCurrentStep();
+      if (!validation.isValid) {
+        setValidationErrors(prev => ({ ...prev, [currentStep]: validation.message }));
+        return;
+      }
 
-    // Clear validation error for this step
-    setValidationErrors(prev => {
-      const newErrors = { ...prev };
-      delete newErrors[currentStep];
-      return newErrors;
-    });
+      // Clear validation error for this step
+      setValidationErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[currentStep];
+        return newErrors;
+      });
 
-    // If we're finishing step 4 and moving to Results, submit now
-    if (currentStep === 4) {
-      await handleSubmitToBackend();
-    }
+      // If we're finishing step 4 and moving to Results, submit now
+      if (currentStep === 4) {
+        await handleSubmitToBackend();
+      }
 
-    if (currentStep < STEPS.length) {
-      setCurrentStep(prev => prev + 1);
+      // Move to next step
+      if (currentStep < STEPS.length) {
+        setCurrentStep(prev => prev + 1);
+      }
+    } catch (error) {
+      console.error('Error in handleNext:', error);
+      // Don't proceed if there's an error
     }
   };
 
@@ -275,7 +282,7 @@ export const AssessmentFlow = () => {
   };
 
   const handlePrevious = () => {
-    if (currentStep > 1) {
+    if (currentStep > 1 && !isLoading) {
       setCurrentStep(prev => prev - 1);
     }
   };

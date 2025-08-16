@@ -50,9 +50,9 @@ export const PersonalityQuiz: React.FC<PersonalityQuizProps> = ({
     }, 150);
   };
 
-  const onContinue = () => {
+  const onContinue = async () => {
     // Save answers in the expected field for validation
-    onNext({ personality: answers });
+    await onNext({ personality: answers });
   };
 
   return (
