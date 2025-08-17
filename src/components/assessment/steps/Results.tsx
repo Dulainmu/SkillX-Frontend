@@ -411,230 +411,44 @@ export const Results: React.FC<ResultsProps> = ({ data, onNext, onPrevious, canG
                     </Card>
                 )}
 
-                {/* Career Matches with Skills Analysis */}
-                <div className="space-y-8">
-                    {topMatches.map((match, index) => {
-                        // Get the career path details to access required skills
-                        const careerPath = pathsById[match.pathId] || findPathById(backend?.paths, match.pathId);
-                        
-                        // Get only the skills that are required for this specific career path
-                        const careerSkills = careerPath?.requiredSkills ? careerPath.requiredSkills.map((requiredSkill: any) => {
-                            const userSkill = data.skills ? data.skills[requiredSkill.skillName] : null;
-                            return {
-                                skillName: requiredSkill.skillName,
-                                requiredLevel: requiredSkill.requiredLevel,
-                                importance: requiredSkill.importance,
-                                userLevel: userSkill?.selected ? userSkill.level : 0,
-                                hasSkill: userSkill?.selected && userSkill.level > 0
-                            };
-                        }) : [];
-
-                        const getLevelDescription = (level: number) => {
-                            const descriptions = {
-                                1: 'Beginner - Basic understanding, can follow tutorials',
-                                2: 'Intermediate - Can work on projects independently',
-                                3: 'Advanced - Can handle complex projects and mentor beginners',
-                                4: 'Expert - Can architect solutions and lead teams'
-                            };
-                            return descriptions[level as keyof typeof descriptions] || 'Skill level assessed';
-                        };
-
-                        const getLevelColor = (level: number) => {
-                            const colors = {
-                                1: 'from-blue-400 to-blue-600',
-                                2: 'from-green-400 to-green-600',
-                                3: 'from-purple-400 to-purple-600',
-                                4: 'from-orange-400 to-orange-600'
-                            };
-                            return colors[level as keyof typeof colors] || 'from-gray-400 to-gray-600';
-                        };
-
-                        const getNextLevelTarget = (currentLevel: number) => {
-                            if (currentLevel >= 4) return 'Master level achieved!';
-                            const nextLevel = currentLevel + 1;
-                            const targets = {
-                                2: 'Focus on independent project work and problem-solving',
-                                3: 'Work on complex projects and start mentoring others',
-                                4: 'Lead teams and architect solutions'
-                            };
-                            return targets[nextLevel as keyof typeof targets] || 'Continue building experience';
-                        };
-
-                        const getEstimatedTime = (currentLevel: number) => {
-                            const estimates = {
-                                1: '3-6 months',
-                                2: '6-12 months',
-                                3: '12-18 months'
-                            };
-                            return estimates[currentLevel as keyof typeof estimates] || 'Varies';
-                        };
-
-                        return (
-                            <Card key={match.pathId} className="p-6">
-                                <div className="flex items-start justify-between mb-6">
-                                    <div className="flex-1">
-                                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{match.name}</h3>
-                                        <p className="text-gray-600 mb-4">{match.description}</p>
-                                        <div className="flex items-center gap-6 text-sm">
-                                            <div className="flex items-center gap-2">
-                                                <span className="font-medium">Match Score:</span>
-                                                <span className="text-lg font-bold text-blue-600">{Math.round(match.currentRole.score)}%</span>
-                                            </div>
-                                            {match.averageSalary && (
-                                                <div className="flex items-center gap-2">
-                                                    <span className="font-medium">Salary:</span>
-                                                    <span className="text-green-600">{match.averageSalary}</span>
-                                                </div>
-                                            )}
-                                            {match.jobGrowth && (
-                                                <div className="flex items-center gap-2">
-                                                    <span className="font-medium">Growth:</span>
-                                                    <span className="text-purple-600">{match.jobGrowth}</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <Button 
-                                        onClick={() => handleShowCareerModal(match)}
-                                        className="bg-blue-600 hover:bg-blue-700 text-white"
-                                    >
-                                        View Details
-                                    </Button>
+                {/* Career Recommendations Summary */}
+                <Card className="p-6 bg-gradient-to-r from-green-50 to-blue-50 border border-green-200">
+                    <h3 className="text-2xl font-bold mb-6 flex items-center">
+                        <span className="mr-2">🎯</span> Your Career Recommendations
+                    </h3>
+                    
+                    <div className="grid md:grid-cols-3 gap-6 mb-6">
+                        {topMatches.slice(0, 3).map((match, index) => (
+                            <div key={match.pathId} className="p-4 bg-white rounded-lg border border-green-100">
+                                <div className="flex items-center justify-between mb-2">
+                                    <h4 className="font-semibold text-gray-900">{match.name}</h4>
+                                    <span className="text-sm font-bold text-blue-600">{Math.round(match.currentRole.score)}%</span>
                                 </div>
-
-                                {/* Skills Assessment for this Career */}
-                                {careerSkills.length > 0 && (
-                                    <div className="mt-8">
-                                        <h4 className="text-xl font-bold mb-4 flex items-center">
-                                            <span className="mr-2">⚡</span> Skills Assessment for {match.name}
-                                        </h4>
-                                        
-                                        <div className="grid md:grid-cols-2 gap-6">
-                                            {/* Required Skills for this Career */}
-                                            <div>
-                                                <h5 className="font-semibold mb-3 text-lg">Required Skills for {match.name}</h5>
-                                                <div className="space-y-3">
-                                                    {careerSkills.length > 0 ? careerSkills.map((skill: any) => (
-                                                        <div key={skill.skillName} className="p-3 rounded-lg border border-gray-200">
-                                                            <div className="flex justify-between items-center mb-2">
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className="font-medium text-sm">{skill.skillName}</span>
-                                                                    <span className={`text-xs px-2 py-1 rounded ${
-                                                                        skill.importance === 'essential' ? 'bg-red-100 text-red-700' :
-                                                                        skill.importance === 'important' ? 'bg-yellow-100 text-yellow-700' :
-                                                                        'bg-blue-100 text-blue-700'
-                                                                    }`}>
-                                                                        {skill.importance}
-                                                                    </span>
-                                                                </div>
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className="text-xs font-semibold">
-                                                                        {skill.hasSkill ? `Level ${skill.userLevel}` : 'Not assessed'}
-                                                                    </span>
-                                                                    {skill.hasSkill && (
-                                                                        <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${getLevelColor(skill.userLevel)}`}></div>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                            <div className="w-full h-1.5 bg-gray-200 rounded mb-1">
-                                                                <div 
-                                                                    className={`h-1.5 bg-gradient-to-r ${skill.hasSkill ? getLevelColor(skill.userLevel) : 'from-gray-400 to-gray-600'} rounded`}
-                                                                    style={{ width: `${skill.hasSkill ? (skill.userLevel / 4) * 100 : 0}%` }}
-                                                                />
-                                                            </div>
-                                                            <div className="flex justify-between items-center text-xs text-gray-600">
-                                                                <span>Required: Level {skill.requiredLevel}</span>
-                                                                <span>{skill.hasSkill ? getLevelDescription(skill.userLevel) : 'Not assessed yet'}</span>
-                                                            </div>
-                                                        </div>
-                                                    )) : (
-                                                        <div className="p-3 rounded-lg border border-gray-200 bg-gray-50">
-                                                            <p className="text-sm text-gray-600">No specific skills defined for this career path yet.</p>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            {/* Learning Recommendations */}
-                                            <div>
-                                                <h5 className="font-semibold mb-3 text-lg">Learning Recommendations</h5>
-                                                <div className="space-y-3">
-                                                    {careerSkills.length > 0 ? careerSkills.map((skill: any) => (
-                                                        <div key={skill.skillName} className="p-3 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200">
-                                                            <div className="flex justify-between items-center mb-1">
-                                                                <span className="font-medium text-blue-900 text-sm">{skill.skillName}</span>
-                                                                <span className="text-xs text-blue-600 bg-blue-100 px-2 py-0.5 rounded">
-                                                                    {skill.hasSkill ? 
-                                                                        `Level ${skill.userLevel} → ${skill.userLevel < skill.requiredLevel ? skill.requiredLevel : 'Target'}`
-                                                                        : `Target: Level ${skill.requiredLevel}`
-                                                                    }
-                                                                </span>
-                                                            </div>
-                                                            <p className="text-xs text-blue-800 mb-1">
-                                                                {skill.hasSkill ? 
-                                                                    (skill.userLevel >= skill.requiredLevel ? 
-                                                                        'Skill requirement met! 🎉' : 
-                                                                        `Need ${skill.requiredLevel - skill.userLevel} more level(s)`
-                                                                    ) : 
-                                                                    `Start learning ${skill.skillName} to reach Level ${skill.requiredLevel}`
-                                                                }
-                                                            </p>
-                                                            <div className="flex justify-between items-center text-xs text-blue-600">
-                                                                <span>Required: Level {skill.requiredLevel}</span>
-                                                                <span className={`${
-                                                                    skill.importance === 'essential' ? 'text-red-600' :
-                                                                    skill.importance === 'important' ? 'text-yellow-600' :
-                                                                    'text-blue-600'
-                                                                }`}>
-                                                                    {skill.importance}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    )) : (
-                                                        <div className="p-3 rounded-lg bg-gray-50 border border-gray-200">
-                                                            <p className="text-sm text-gray-600">No specific learning recommendations available.</p>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Career Path Summary */}
-                                        <div className="mt-6 p-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg border border-gray-200">
-                                            <h5 className="font-semibold mb-2 text-gray-800">Career Path Summary</h5>
-                                            <div className="grid grid-cols-3 gap-4 text-sm">
-                                                <div className="text-center">
-                                                    <div className="text-lg font-bold text-blue-600">
-                                                        {careerSkills.length}
-                                                    </div>
-                                                    <div className="text-xs text-gray-600">Skills Assessed</div>
-                                                </div>
-                                                <div className="text-center">
-                                                    <div className="text-lg font-bold text-green-600">
-                                                        {(() => {
-                                                            const skills = careerSkills.filter((skill: any) => skill.hasSkill && skill.userLevel >= 2);
-                                                            return skills.length;
-                                                        })()}
-                                                    </div>
-                                                    <div className="text-xs text-gray-600">Intermediate+</div>
-                                                </div>
-                                                <div className="text-center">
-                                                    <div className="text-lg font-bold text-purple-600">
-                                                        {(() => {
-                                                            const skills = careerSkills.filter((skill: any) => skill.hasSkill && skill.userLevel >= 3);
-                                                            return skills.length;
-                                                        })()}
-                                                    </div>
-                                                    <div className="text-xs text-gray-600">Advanced+</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                            </Card>
-                        );
-                    })}
-                </div>
+                                <p className="text-sm text-gray-600 mb-3">{match.description}</p>
+                                <div className="flex items-center gap-4 text-xs text-gray-500">
+                                    {match.averageSalary && (
+                                        <span>💰 {match.averageSalary}</span>
+                                    )}
+                                    {match.jobGrowth && (
+                                        <span>📈 {match.jobGrowth}</span>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    
+                    <div className="text-center">
+                        <Button 
+                            onClick={handleBrowseAllCareers}
+                            className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-8 py-3"
+                        >
+                            Browse All Career Paths
+                        </Button>
+                        <p className="text-sm text-gray-600 mt-2">
+                            Explore detailed roadmaps and learning paths for each career
+                        </p>
+                    </div>
+                </Card>
 
                 {/* Assessment Summary */}
                 <Card className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200">

@@ -92,7 +92,8 @@ const BrowseCareers = () => {
   });
 
   const handleStartCareerPath = (career: CareerRecommendation) => {
-    navigate(`/career/${career.id}`);
+    // Navigate to the career roadmap page with the career ID
+    navigate(`/career-roadmap/${career.id}`);
   };
 
   const handleTakeAssessment = () => {
