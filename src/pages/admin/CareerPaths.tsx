@@ -62,6 +62,9 @@ interface CareerPath {
   detailedRoadmap: RoadmapStep[];
   averageSalary?: string;
   jobGrowth?: string;
+  // Skills and Tasks for display (NEW)
+  displaySkills?: string[]; // Skills shown in "Skills You'll Learn" section
+  displayTasks?: string[]; // Tasks shown in "What You'll Do" section
   // Personality data for unified system
   desiredRIASEC?: {
     R: number;
@@ -122,6 +125,8 @@ const emptyForm: CareerPath = {
   detailedRoadmap: [],
   averageSalary: '',
   jobGrowth: '',
+  displaySkills: [],
+  displayTasks: [],
   desiredRIASEC: {
     R: 0.5, I: 0.5, A: 0.5, S: 0.5, E: 0.5, C: 0.5
   },
@@ -245,6 +250,8 @@ const CareerPaths: React.FC = () => {
   const [selectedSkillImportance, setSelectedSkillImportance] = useState<'essential' | 'important' | 'nice-to-have'>('important');
   const [newRoadmapStep, setNewRoadmapStep] = useState('');
   const [newWorkValue, setNewWorkValue] = useState('');
+  const [newDisplaySkill, setNewDisplaySkill] = useState('');
+  const [newDisplayTask, setNewDisplayTask] = useState('');
 
   // Fetch all career paths
   const fetchData = async () => {
@@ -374,6 +381,32 @@ const CareerPaths: React.FC = () => {
   // Remove work value
   const removeWorkValue = (value: string) => {
     setForm({ ...form, workValues: form.workValues?.filter(v => v !== value) || [] });
+  };
+
+  // Add display skill
+  const addDisplaySkill = () => {
+    if (newDisplaySkill.trim() && !form.displaySkills?.includes(newDisplaySkill.trim())) {
+      setForm({ ...form, displaySkills: [...(form.displaySkills || []), newDisplaySkill.trim()] });
+      setNewDisplaySkill('');
+    }
+  };
+
+  // Remove display skill
+  const removeDisplaySkill = (index: number) => {
+    setForm({ ...form, displaySkills: form.displaySkills?.filter((_, i) => i !== index) || [] });
+  };
+
+  // Add display task
+  const addDisplayTask = () => {
+    if (newDisplayTask.trim() && !form.displayTasks?.includes(newDisplayTask.trim())) {
+      setForm({ ...form, displayTasks: [...(form.displayTasks || []), newDisplayTask.trim()] });
+      setNewDisplayTask('');
+    }
+  };
+
+  // Remove display task
+  const removeDisplayTask = (index: number) => {
+    setForm({ ...form, displayTasks: form.displayTasks?.filter((_, i) => i !== index) || [] });
   };
 
   // Add detailed roadmap step
@@ -857,6 +890,105 @@ const CareerPaths: React.FC = () => {
                     ))}
                   </div>
                 )}
+              </div>
+
+              <Separator />
+
+              {/* Display Skills and Tasks */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                  <Target className="w-5 h-5" />
+                  Display Skills & Tasks
+                </h3>
+                <p className="text-sm text-gray-600">
+                  These skills and tasks will be shown to users in the career cards on both the Browse Careers and Career Assessment pages.
+                </p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Display Skills */}
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium">Skills You'll Learn</Label>
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Add a skill (e.g., JavaScript, React, Database Design)"
+                          value={newDisplaySkill}
+                          onChange={(e) => setNewDisplaySkill(e.target.value)}
+                          onKeyPress={(e) => e.key === 'Enter' && addDisplaySkill()}
+                        />
+                        <Button 
+                          type="button" 
+                          onClick={addDisplaySkill} 
+                          variant="outline" 
+                          size="sm"
+                          disabled={!newDisplaySkill.trim()}
+                        >
+                          <PlusIcon className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      
+                      {form.displaySkills && form.displaySkills.length > 0 && (
+                        <div className="space-y-1">
+                          {form.displaySkills.map((skill, index) => (
+                            <div key={index} className="flex items-center justify-between p-2 bg-blue-50 rounded border">
+                              <span className="text-sm">{skill}</span>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeDisplaySkill(index)}
+                              >
+                                <MinusIcon className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Display Tasks */}
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium">What You'll Do</Label>
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Add a task (e.g., Build web applications, Manage databases)"
+                          value={newDisplayTask}
+                          onChange={(e) => setNewDisplayTask(e.target.value)}
+                          onKeyPress={(e) => e.key === 'Enter' && addDisplayTask()}
+                        />
+                        <Button 
+                          type="button" 
+                          onClick={addDisplayTask} 
+                          variant="outline" 
+                          size="sm"
+                          disabled={!newDisplayTask.trim()}
+                        >
+                          <PlusIcon className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      
+                      {form.displayTasks && form.displayTasks.length > 0 && (
+                        <div className="space-y-1">
+                          {form.displayTasks.map((task, index) => (
+                            <div key={index} className="flex items-center justify-between p-2 bg-green-50 rounded border">
+                              <span className="text-sm">{task}</span>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeDisplayTask(index)}
+                              >
+                                <MinusIcon className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <Separator />

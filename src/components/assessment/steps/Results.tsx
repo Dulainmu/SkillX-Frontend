@@ -811,17 +811,17 @@ export const Results: React.FC<ResultsProps> = ({ data, onNext, onPrevious, canG
                                         </h4>
                                         <div className="bg-muted/30 rounded-lg p-3">
                                             <ul className="text-sm text-muted-foreground space-y-1">
-                                                {getCareerSkills(m.name).slice(0, 4).map((skill, index) => (
-                                                    <li key={index} className="flex items-center">
-                                                        <div className="w-1 h-1 bg-primary rounded-full mr-2 flex-shrink-0"></div>
-                                                        {skill}
-                                                    </li>
-                                                ))}
-                                                {getCareerSkills(m.name).length > 4 && (
-                                                    <li className="text-primary font-medium text-xs">
-                                                        + {getCareerSkills(m.name).length - 4} more skills to master
-                                                    </li>
-                                                )}
+                                                                              {(m.displaySkills || getCareerSkills(m.name)).slice(0, 4).map((skill, index) => (
+                                <li key={index} className="flex items-center">
+                                  <div className="w-1 h-1 bg-primary rounded-full mr-2 flex-shrink-0"></div>
+                                  {skill}
+                                </li>
+                              ))}
+                              {(m.displaySkills || getCareerSkills(m.name)).length > 4 && (
+                                <li className="text-primary font-medium text-xs">
+                                  + {(m.displaySkills || getCareerSkills(m.name)).length - 4} more skills to master
+                                </li>
+                              )}
                                             </ul>
                                         </div>
                                     </div>
@@ -833,12 +833,12 @@ export const Results: React.FC<ResultsProps> = ({ data, onNext, onPrevious, canG
                                         </h4>
                                         <div className="bg-secondary/10 rounded-lg p-3 border border-secondary/20">
                                             <ul className="text-sm text-muted-foreground space-y-1">
-                                                {getCareerTasks(m.name).map((task, index) => (
-                                                    <li key={index} className="flex items-start">
-                                                        <div className="w-1 h-1 bg-secondary rounded-full mr-2 mt-1.5 flex-shrink-0"></div>
-                                                        {task}
-                                                    </li>
-                                                ))}
+                                                                              {(m.displayTasks || getCareerTasks(m.name)).map((task, index) => (
+                                <li key={index} className="flex items-start">
+                                  <div className="w-1 h-1 bg-secondary rounded-full mr-2 mt-1.5 flex-shrink-0"></div>
+                                  {task}
+                                </li>
+                              ))}
                                             </ul>
                                         </div>
                                     </div>
