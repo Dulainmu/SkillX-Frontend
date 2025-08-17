@@ -129,6 +129,144 @@ export const Results: React.FC<ResultsProps> = ({ data, onNext, onPrevious, canG
     const [selectedCareer, setSelectedCareer] = useState<BackendTopMatch | null>(null);
     const [selectedPath, setSelectedPath] = useState<BackendPath | null>(null);
 
+    // Function to get career-specific skills
+    const getCareerSkills = (careerName: string): string[] => {
+        const skillsMap: { [key: string]: string[] } = {
+            'Frontend Developer': [
+                'HTML & CSS',
+                'JavaScript',
+                'React/Vue/Angular',
+                'Responsive Design',
+                'UI/UX Principles',
+                'Performance Optimization'
+            ],
+            'Backend Developer': [
+                'Node.js/Python/Java',
+                'Database Design',
+                'API Development',
+                'Server Architecture',
+                'Security Best Practices',
+                'Cloud Services'
+            ],
+            'Full Stack Developer': [
+                'JavaScript/TypeScript',
+                'React & Node.js',
+                'Database Management',
+                'API Integration',
+                'Deployment & DevOps',
+                'Full Stack Architecture'
+            ],
+            'UX Designer': [
+                'User Research',
+                'Wireframing & Prototyping',
+                'UI Design Tools',
+                'User Testing',
+                'Design Systems',
+                'Interaction Design'
+            ],
+            'Data Scientist': [
+                'Python/R Programming',
+                'Machine Learning',
+                'Statistical Analysis',
+                'Data Visualization',
+                'Big Data Technologies',
+                'Predictive Modeling'
+            ],
+            'DevOps Engineer': [
+                'CI/CD Pipelines',
+                'Cloud Platforms',
+                'Containerization',
+                'Infrastructure as Code',
+                'Monitoring & Logging',
+                'Security & Compliance'
+            ],
+            'Mobile Developer': [
+                'iOS/Android Development',
+                'Mobile UI/UX',
+                'App Store Optimization',
+                'Performance Tuning',
+                'Cross-platform Development',
+                'Mobile Security'
+            ],
+            'Cybersecurity Analyst': [
+                'Security Assessment',
+                'Threat Detection',
+                'Incident Response',
+                'Network Security',
+                'Compliance & Auditing',
+                'Security Tools & Technologies'
+            ]
+        };
+
+        return skillsMap[careerName] || [
+            'Technical Problem Solving',
+            'Industry-specific Tools',
+            'Best Practices',
+            'Continuous Learning'
+        ];
+    };
+
+    // Function to get career-specific tasks
+    const getCareerTasks = (careerName: string): string[] => {
+        const tasksMap: { [key: string]: string[] } = {
+            'Frontend Developer': [
+                'Build responsive web interfaces',
+                'Create interactive user experiences',
+                'Optimize website performance',
+                'Ensure cross-browser compatibility'
+            ],
+            'Backend Developer': [
+                'Develop server-side applications',
+                'Design and manage databases',
+                'Build RESTful APIs',
+                'Implement security measures'
+            ],
+            'Full Stack Developer': [
+                'Build complete web applications',
+                'Work on both frontend and backend',
+                'Deploy applications to production',
+                'Manage the entire development stack'
+            ],
+            'UX Designer': [
+                'Conduct user research and testing',
+                'Create wireframes and prototypes',
+                'Design user interfaces',
+                'Improve user experience flows'
+            ],
+            'Data Scientist': [
+                'Analyze large datasets',
+                'Build machine learning models',
+                'Create data visualizations',
+                'Make data-driven decisions'
+            ],
+            'DevOps Engineer': [
+                'Automate deployment processes',
+                'Manage cloud infrastructure',
+                'Monitor system performance',
+                'Ensure continuous integration'
+            ],
+            'Mobile Developer': [
+                'Build native mobile apps',
+                'Optimize app performance',
+                'Handle app store submissions',
+                'Implement mobile-specific features'
+            ],
+            'Cybersecurity Analyst': [
+                'Protect systems from threats',
+                'Conduct security assessments',
+                'Monitor network activity',
+                'Respond to security incidents'
+            ]
+        };
+
+        return tasksMap[careerName] || [
+            'Develop technical solutions',
+            'Collaborate with team members',
+            'Solve complex problems',
+            'Stay updated with industry trends'
+        ];
+    };
+
     // Fallback fetch if AssessmentFlow didn't set backend payload
     useEffect(() => {
         if (backend) return;
@@ -662,6 +800,48 @@ export const Results: React.FC<ResultsProps> = ({ data, onNext, onPrevious, canG
                                             </div>
                                         </div>
                                     )}
+                                </div>
+
+                                {/* Skills You'll Learn & What You'll Do */}
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    <div>
+                                        <h4 className="font-semibold mb-3 text-foreground flex items-center gap-2">
+                                            <span className="text-lg">🧠</span>
+                                            Skills You'll Learn:
+                                        </h4>
+                                        <div className="bg-muted/30 rounded-lg p-3">
+                                            <ul className="text-sm text-muted-foreground space-y-1">
+                                                {getCareerSkills(m.name).slice(0, 4).map((skill, index) => (
+                                                    <li key={index} className="flex items-center">
+                                                        <div className="w-1 h-1 bg-primary rounded-full mr-2 flex-shrink-0"></div>
+                                                        {skill}
+                                                    </li>
+                                                ))}
+                                                {getCareerSkills(m.name).length > 4 && (
+                                                    <li className="text-primary font-medium text-xs">
+                                                        + {getCareerSkills(m.name).length - 4} more skills to master
+                                                    </li>
+                                                )}
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h4 className="font-semibold mb-3 text-foreground flex items-center gap-2">
+                                            <span className="text-lg">💼</span>
+                                            What You'll Do:
+                                        </h4>
+                                        <div className="bg-secondary/10 rounded-lg p-3 border border-secondary/20">
+                                            <ul className="text-sm text-muted-foreground space-y-1">
+                                                {getCareerTasks(m.name).map((task, index) => (
+                                                    <li key={index} className="flex items-start">
+                                                        <div className="w-1 h-1 bg-secondary rounded-full mr-2 mt-1.5 flex-shrink-0"></div>
+                                                        {task}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {/* Stats */}
