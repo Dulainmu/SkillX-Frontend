@@ -100,6 +100,42 @@ declare global {
       selectCareerPath(careerSlug: string): Chainable<void>
       
       /**
+       * Custom command to create test learning material
+       * @example cy.createTestLearningMaterial()
+       */
+      createTestLearningMaterial(): Chainable<void>
+      
+      /**
+       * Custom command to create multiple test materials
+       * @example cy.createMultipleTestMaterials(5)
+       */
+      createMultipleTestMaterials(count: number): Chainable<void>
+      
+      /**
+       * Custom command to create test project
+       * @example cy.createTestProject()
+       */
+      createTestProject(): Chainable<void>
+      
+      /**
+       * Custom command to create multiple test projects
+       * @example cy.createMultipleTestProjects(5)
+       */
+      createMultipleTestProjects(count: number): Chainable<void>
+      
+      /**
+       * Custom command to create project with specific skill level
+       * @example cy.createProjectWithSkillLevel('beginner')
+       */
+      createProjectWithSkillLevel(skillLevel: string): Chainable<void>
+      
+      /**
+       * Custom command to create project for specific career path
+       * @example cy.createProjectForCareerPath('Frontend Developer')
+       */
+      createProjectForCareerPath(careerPath: string): Chainable<void>
+      
+      /**
        * Custom command to access learning materials
        * @example cy.accessLearningMaterials()
        */

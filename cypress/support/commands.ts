@@ -70,9 +70,6 @@ Cypress.Commands.add('clearTestData', () => {
   // Clear localStorage
   cy.clearLocalStorage()
   
-  // Clear sessionStorage
-  cy.clearSessionStorage()
-  
   // Clear cookies
   cy.clearCookies()
 })
@@ -238,4 +235,138 @@ Cypress.Commands.overwrite('visit', (originalFn, url, options) => {
   }
   
   return originalFn(url, options)
+})
+
+// Custom commands for Learning Materials Management (Module 5)
+Cypress.Commands.add('createTestLearningMaterial', () => {
+  cy.request({
+    method: 'POST',
+    url: `${Cypress.env('apiUrl')}/api/learning-materials`,
+    headers: {
+      'Authorization': `Bearer ${Cypress.env('adminToken')}`
+    },
+    body: {
+      title: 'Test Material',
+      description: 'Test Description',
+      type: 'video',
+      difficulty: 'beginner',
+      careerPath: 'Frontend Developer',
+      url: 'https://example.com',
+      duration: 30,
+      isActive: true
+    }
+  })
+})
+
+Cypress.Commands.add('createMultipleTestMaterials', (count: number) => {
+  for (let i = 1; i <= count; i++) {
+    cy.request({
+      method: 'POST',
+      url: `${Cypress.env('apiUrl')}/api/learning-materials`,
+      headers: {
+        'Authorization': `Bearer ${Cypress.env('adminToken')}`
+      },
+      body: {
+        title: `Test Material ${i}`,
+        description: `Test Description ${i}`,
+        type: 'video',
+        difficulty: 'beginner',
+        careerPath: 'Frontend Developer',
+        url: `https://example.com/material-${i}`,
+        duration: 30,
+        isActive: true
+      }
+    })
+  }
+})
+
+// Custom commands for Project Management (Module 6)
+Cypress.Commands.add('createTestProject', () => {
+  cy.request({
+    method: 'POST',
+    url: `${Cypress.env('apiUrl')}/api/projects`,
+    headers: {
+      'Authorization': `Bearer ${Cypress.env('adminToken')}`
+    },
+    body: {
+      title: 'Test Project',
+      description: 'Test Description',
+      careerPath: 'Full Stack Developer',
+      difficulty: 'intermediate',
+      estimatedHours: 15,
+      prerequisites: 'JavaScript, React basics',
+      learningObjectives: 'Build a React application',
+      requirements: ['Test Requirement'],
+      deliverables: ['Test Deliverable'],
+      isActive: true
+    }
+  })
+})
+
+Cypress.Commands.add('createMultipleTestProjects', (count: number) => {
+  for (let i = 1; i <= count; i++) {
+    cy.request({
+      method: 'POST',
+      url: `${Cypress.env('apiUrl')}/api/projects`,
+      headers: {
+        'Authorization': `Bearer ${Cypress.env('adminToken')}`
+      },
+      body: {
+        title: `Test Project ${i}`,
+        description: `Test Description ${i}`,
+        careerPath: 'Full Stack Developer',
+        difficulty: 'intermediate',
+        estimatedHours: 15,
+        prerequisites: 'JavaScript, React basics',
+        learningObjectives: 'Build a React application',
+        requirements: [`Test Requirement ${i}`],
+        deliverables: [`Test Deliverable ${i}`],
+        isActive: true
+      }
+    })
+  }
+})
+
+Cypress.Commands.add('createProjectWithSkillLevel', (skillLevel: string) => {
+  cy.request({
+    method: 'POST',
+    url: `${Cypress.env('apiUrl')}/api/projects`,
+    headers: {
+      'Authorization': `Bearer ${Cypress.env('adminToken')}`
+    },
+    body: {
+      title: `${skillLevel.charAt(0).toUpperCase() + skillLevel.slice(1)} Project`,
+      description: `A ${skillLevel} level project`,
+      careerPath: 'Full Stack Developer',
+      difficulty: skillLevel,
+      estimatedHours: 15,
+      prerequisites: 'JavaScript basics',
+      learningObjectives: 'Learn project development',
+      requirements: ['Basic requirement'],
+      deliverables: ['Working application'],
+      isActive: true
+    }
+  })
+})
+
+Cypress.Commands.add('createProjectForCareerPath', (careerPath: string) => {
+  cy.request({
+    method: 'POST',
+    url: `${Cypress.env('apiUrl')}/api/projects`,
+    headers: {
+      'Authorization': `Bearer ${Cypress.env('adminToken')}`
+    },
+    body: {
+      title: `${careerPath} Project`,
+      description: `A project for ${careerPath}`,
+      careerPath: careerPath,
+      difficulty: 'intermediate',
+      estimatedHours: 15,
+      prerequisites: 'Basic programming knowledge',
+      learningObjectives: 'Learn career-specific skills',
+      requirements: ['Career-specific requirement'],
+      deliverables: ['Career-specific deliverable'],
+      isActive: true
+    }
+  })
 })
